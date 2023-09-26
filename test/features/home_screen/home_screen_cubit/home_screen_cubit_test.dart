@@ -51,5 +51,13 @@ void main() {
       expect: () =>
           [LanguagesSelected(sourceLanguage: 'GR', targetLanguage: 'FR')],
     );
+
+    blocTest<HomeScreenCubit, HomeScreenState>(
+      'emits [LanguagesSelected] with reversed values when reverseLanguages is triggered.',
+      build: () => homeScreenCubit,
+      act: (cubit) => cubit.reverseLanguages(),
+      expect: () =>
+          [LanguagesSelected(sourceLanguage: 'FR', targetLanguage: 'GR')],
+    );
   });
 }

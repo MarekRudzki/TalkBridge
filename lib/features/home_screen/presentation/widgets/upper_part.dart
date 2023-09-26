@@ -20,7 +20,7 @@ class UpperPart extends StatelessWidget {
               children: [
                 const Spacer(),
                 Container(
-                  color: Colors.amber,
+                  color: const Color.fromARGB(255, 213, 210, 210),
                   child: Row(
                     children: [
                       const SizedBox(width: 15),
@@ -34,7 +34,7 @@ class UpperPart extends StatelessWidget {
                                   state.targetLanguage,
                                   height: 31.2,
                                   width: 40.3,
-                                  borderRadius: 8,
+                                  borderRadius: 6,
                                 );
                               }
                               return const SizedBox.shrink();
@@ -65,7 +65,7 @@ class UpperPart extends StatelessWidget {
                                   state.sourceLanguage,
                                   height: 31.2,
                                   width: 40.3,
-                                  borderRadius: 8,
+                                  borderRadius: 6,
                                 );
                               }
                               return const SizedBox.shrink();

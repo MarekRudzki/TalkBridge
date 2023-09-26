@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             UpperPart(),
             Divider(
-              color: Colors.grey,
+              color: Color.fromARGB(255, 213, 210, 210),
               height: 2,
               thickness: 8,
             ),

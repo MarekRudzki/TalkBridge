@@ -28,4 +28,14 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     setSourceLanguage(language: languageModel.sourceLanguage);
     setTargetLanguage(language: languageModel.targetLanguage);
   }
+
+  Future<void> reverseLanguages() async {
+    final sourceLanguage = repository.getSavedLanguages().sourceLanguage;
+    final targetLanguage = repository.getSavedLanguages().targetLanguage;
+
+    await repository.setTargetLanguage(language: sourceLanguage);
+    await repository.setSourceLanguage(language: targetLanguage);
+    emit(LanguagesSelected(
+        sourceLanguage: targetLanguage, targetLanguage: sourceLanguage));
+  }
 }

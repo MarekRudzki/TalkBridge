@@ -47,7 +47,13 @@ class LanguagePickScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 213, 210, 210),
-        appBar: AppBar(),
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 75, 207, 143),
+          title: isSelectingSourceLng
+              ? const Text('Source language')
+              : const Text('Target language'),
+          centerTitle: true,
+        ),
         body: Column(
           children: [
             Expanded(
@@ -78,14 +84,7 @@ class LanguagePickScreen extends StatelessWidget {
                         },
                         child: Row(
                           children: [
-                            const SizedBox(width: 20),
-                            Text(
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                              langauges.keys.map((e) => e).toList()[index],
-                            ),
-                            const Spacer(),
+                            const SizedBox(width: 10),
                             Padding(
                               padding: const EdgeInsets.all(15),
                               child: CountryFlag.fromCountryCode(
@@ -95,6 +94,15 @@ class LanguagePickScreen extends StatelessWidget {
                                 borderRadius: 8,
                               ),
                             ),
+                            const SizedBox(width: 10),
+                            Text(
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              langauges.keys.map((e) => e).toList()[index],
+                            ),
+                            const Spacer(),
                           ],
                         ),
                       ),
