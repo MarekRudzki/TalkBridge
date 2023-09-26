@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:talkbridge/home_page.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:talkbridge/features/home_screen/home_screen.dart';
+import 'package:talkbridge/features/home_screen/data/datasources/language_local_data_source.dart';
+import 'package:talkbridge/features/home_screen/domain/repositories/language_repository.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/cubit/home_screen_cubit.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+void main() async {
+  await Hive.initFlutter();
+  await Hive.openBox('language_box');
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    );
-  }
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then(
+    (_) => runApp(
+      BlocProvider(
+        create: (context) => HomeScreenCubit(
+          LanguageRepository(
+            localDataSource: LanguageLocalDataSource(),
+          ),
+        )..setSavedLanguages(),
+        child: const MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: HomeScreen(),
+        ),
+      ),
+    ),
+  );
 }
