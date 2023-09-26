@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talkbridge/home_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,9 +10,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Container(),
+      home: HomePage(),
     );
   }
 }
