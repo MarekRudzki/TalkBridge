@@ -1,7 +1,7 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/cubit/home_screen_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
 
 class LanguagePickScreen extends StatelessWidget {
   final bool isSelectingSourceLng;
@@ -13,35 +13,34 @@ class LanguagePickScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<String, String> langauges = {
-      'Arabic': 'EG',
-      'Bulgarian': 'BG',
-      'Mandarin (Chinese)': 'CN',
-      'Croatian': 'HR',
-      'Czech': 'CZ',
-      'Danish': 'DK',
-      'Dutch (Belgium)': 'BE',
-      'Dutch (Netherlands)': 'NL',
-      'English (Australia)': 'AU',
-      'English (Canada)': 'CA',
-      'English (India)': 'IN',
-      'English (United Kingdom)': 'GB',
-      'English (United States)': 'US',
-      'Estonian': 'EE',
-      'French': 'FR',
-      'German': 'DE',
-      'Greek': 'GR',
-      'Italian': 'IT',
-      'Latvian': 'LV',
-      'Lithuanian': 'LT',
-      'Polish': 'PL',
-      'Portuguese': 'PT',
-      'Romanian': 'RO',
-      'Russian': 'RU',
-      'Serbian': 'RS',
-      'Slovak': 'SK',
-      'Slovenian': 'SI',
-      'Spanish': 'ES',
-      'Turkish': 'TR'
+      'Arabic': 'ar-EG',
+      'Bulgarian': 'bg-BG',
+      'Mandarin (Chinese)': 'zh-CN',
+      'Croatian': 'hr-HR',
+      'Czech': 'cs-CZ',
+      'Danish': 'da-DK',
+      'Dutch (Belgium)': 'nl-BE',
+      'Dutch (Netherlands)': 'nl-NL',
+      'English (Australia)': 'en-AU',
+      'English (Canada)': 'en-CA',
+      'English (India)': 'en-IN',
+      'English (United Kingdom)': 'en-GB',
+      'English (United States)': 'en-US',
+      'Estonian': 'et-EE',
+      'French': 'fr-FR',
+      'German': 'de-DE',
+      'Greek': 'el-GR',
+      'Italian': 'it-IT',
+      'Latvian': 'lv-LV',
+      'Lithuanian': 'lt-LT',
+      'Polish': 'pl-PL',
+      'Portuguese': 'pt-PT',
+      'Romanian': 'ro-RO',
+      'Russian': 'ru-RU',
+      'Slovak': 'sk-SK',
+      'Slovenian': 'sl-SI',
+      'Spanish': 'es-ES',
+      'Turkish': 'tr-TR'
     };
 
     return SafeArea(
@@ -66,14 +65,14 @@ class LanguagePickScreen extends StatelessWidget {
                         onTap: () async {
                           if (isSelectingSourceLng) {
                             await context
-                                .read<HomeScreenCubit>()
+                                .read<LanguageCubit>()
                                 .setSourceLanguage(
                                     language: langauges.values
                                         .map((e) => e)
                                         .toList()[index]);
                           } else {
                             await context
-                                .read<HomeScreenCubit>()
+                                .read<LanguageCubit>()
                                 .setTargetLanguage(
                                     language: langauges.values
                                         .map((e) => e)
@@ -88,7 +87,9 @@ class LanguagePickScreen extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(15),
                               child: CountryFlag.fromCountryCode(
-                                langauges.values.map((e) => e).toList()[index],
+                                langauges.values
+                                    .map((e) => e.substring(3, 5))
+                                    .toList()[index],
                                 height: 38.4,
                                 width: 49.6,
                                 borderRadius: 8,

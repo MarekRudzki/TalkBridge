@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:talkbridge/features/home_screen/domain/models/language_model.dart';
 import 'package:talkbridge/features/home_screen/domain/repositories/language_repository.dart';
 
-part 'home_screen_state.dart';
+part 'language_state.dart';
 
-class HomeScreenCubit extends Cubit<HomeScreenState> {
+class LanguageCubit extends Cubit<LanguageState> {
   final LanguageRepository repository;
-  HomeScreenCubit(this.repository) : super(HomeScreenInitial());
+  LanguageCubit(this.repository) : super(LanguageInitial());
 
   Future<void> setSourceLanguage({required String language}) async {
     await repository.setSourceLanguage(language: language);

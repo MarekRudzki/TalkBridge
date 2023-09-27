@@ -13,7 +13,7 @@ class LanguageLocalDataSource {
 
   String getSourceLanguage() {
     if (!_languageBox.containsKey('source_language')) {
-      setSourceLanguage(language: 'PL');
+      setSourceLanguage(language: 'pl-PL');
     }
     final String sourceLanguage = _languageBox.get('source_language');
     return sourceLanguage;
@@ -21,7 +21,7 @@ class LanguageLocalDataSource {
 
   String getTargetLanguage() {
     if (!_languageBox.containsKey('target_language')) {
-      setTargetLanguage(language: 'GB');
+      setTargetLanguage(language: 'en-GB');
     }
     final String targetLanguage = _languageBox.get('target_language');
     return targetLanguage;

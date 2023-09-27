@@ -1,13 +1,13 @@
-part of 'home_screen_cubit.dart';
+part of 'language_cubit.dart';
 
-class HomeScreenState extends Equatable {
+class LanguageState extends Equatable {
   @override
   List<Object> get props => [];
 }
 
-class HomeScreenInitial extends HomeScreenState {}
+class LanguageInitial extends LanguageState {}
 
-class LanguagesSelected extends HomeScreenState {
+class LanguagesSelected extends LanguageState {
   final String sourceLanguage;
   final String targetLanguage;
 

@@ -1,7 +1,7 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/cubit/home_screen_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
 import 'dart:math' as math;
 
 import 'package:talkbridge/features/home_screen/presentation/widgets/language_pick_screen.dart';
@@ -27,11 +27,11 @@ class UpperPart extends StatelessWidget {
                       InkWell(
                         child: Padding(
                           padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<HomeScreenCubit, HomeScreenState>(
+                          child: BlocBuilder<LanguageCubit, LanguageState>(
                             builder: (context, state) {
                               if (state is LanguagesSelected) {
                                 return CountryFlag.fromCountryCode(
-                                  state.targetLanguage,
+                                  state.targetLanguage.substring(3, 5),
                                   height: 31.2,
                                   width: 40.3,
                                   borderRadius: 6,
@@ -58,11 +58,11 @@ class UpperPart extends StatelessWidget {
                       InkWell(
                         child: Padding(
                           padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<HomeScreenCubit, HomeScreenState>(
+                          child: BlocBuilder<LanguageCubit, LanguageState>(
                             builder: (context, state) {
                               if (state is LanguagesSelected) {
                                 return CountryFlag.fromCountryCode(
-                                  state.sourceLanguage,
+                                  state.sourceLanguage.substring(3, 5),
                                   height: 31.2,
                                   width: 40.3,
                                   borderRadius: 6,
