@@ -5,7 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:talkbridge/features/home_screen/home_screen.dart';
 import 'package:talkbridge/features/home_screen/data/datasources/language_local_data_source.dart';
 import 'package:talkbridge/features/home_screen/domain/repositories/language_repository.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/cubit/home_screen_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -15,12 +16,19 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]).then(
     (_) => runApp(
-      BlocProvider(
-        create: (context) => HomeScreenCubit(
-          LanguageRepository(
-            localDataSource: LanguageLocalDataSource(),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => LanguageCubit(
+              LanguageRepository(
+                localDataSource: LanguageLocalDataSource(),
+              ),
+            )..setSavedLanguages(),
           ),
-        )..setSavedLanguages(),
+          BlocProvider(
+            create: (context) => VoiceRecordCubit(),
+          ),
+        ],
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: HomeScreen(),

@@ -1,8 +1,16 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/cubit/home_screen_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/language_pick_screen.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/voice_recorder.dart';
+
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
+  }
+}
 
 class LowerPart extends StatelessWidget {
   const LowerPart({super.key});
@@ -14,7 +22,28 @@ class LowerPart extends StatelessWidget {
         children: [
           Column(
             children: [
-              const Spacer(),
+              Expanded(
+                child: BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
+                  builder: (context, state) {
+                    if (state is VoiceRecordInitial) {
+                      return Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: SingleChildScrollView(
+                          child: Text(
+                            state.speechText == ''
+                                ? state.speechText
+                                : state.speechText.capitalize(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return const Text('');
+                  },
+                ),
+              ),
               Container(
                 color: const Color.fromARGB(255, 213, 210, 210),
                 child: Row(
@@ -23,11 +52,11 @@ class LowerPart extends StatelessWidget {
                     InkWell(
                       child: Padding(
                         padding: const EdgeInsets.all(15),
-                        child: BlocBuilder<HomeScreenCubit, HomeScreenState>(
+                        child: BlocBuilder<LanguageCubit, LanguageState>(
                           builder: (context, state) {
                             if (state is LanguagesSelected) {
                               return CountryFlag.fromCountryCode(
-                                state.sourceLanguage,
+                                state.sourceLanguage.substring(3, 5),
                                 height: 31.2,
                                 width: 40.3,
                                 borderRadius: 6,
@@ -54,11 +83,11 @@ class LowerPart extends StatelessWidget {
                     InkWell(
                       child: Padding(
                         padding: const EdgeInsets.all(15),
-                        child: BlocBuilder<HomeScreenCubit, HomeScreenState>(
+                        child: BlocBuilder<LanguageCubit, LanguageState>(
                           builder: (context, state) {
                             if (state is LanguagesSelected) {
                               return CountryFlag.fromCountryCode(
-                                state.targetLanguage,
+                                state.targetLanguage.substring(3, 5),
                                 height: 31.2,
                                 width: 40.3,
                                 borderRadius: 6,
@@ -79,9 +108,7 @@ class LowerPart extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () async {
-                        await context
-                            .read<HomeScreenCubit>()
-                            .reverseLanguages();
+                        await context.read<LanguageCubit>().reverseLanguages();
                       },
                       icon: const Icon(
                         Icons.cached,
@@ -95,32 +122,11 @@ class LowerPart extends StatelessWidget {
               )
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(20),
+          const Padding(
+            padding: EdgeInsets.all(20),
             child: Align(
               alignment: Alignment.bottomRight,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.greenAccent,
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                    width: 8,
-                    color: Colors.white,
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: InkWell(
-                    onTap: () {},
-                    child: const Icon(
-                      size: 45,
-                      color: Colors.white,
-                      Icons.keyboard_voice_outlined,
-                    ),
-                  ),
-                ),
-              ),
+              child: VoiceRecorder(), //TODO change at upper
             ),
           ),
         ],
