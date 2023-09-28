@@ -11,9 +11,7 @@ import 'package:talkbridge/features/home_screen/presentation/cubits/language/lan
 import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 class VoiceRecorder extends StatelessWidget {
-  const VoiceRecorder({
-    super.key,
-  });
+  const VoiceRecorder({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +30,14 @@ class VoiceRecorder extends StatelessWidget {
           encoder: AudioEncoder.wav,
           bitRate: 12800,
         );
+      } else {
+        await record.stop();
       }
     }
 
     Future<void> stopRecording({required String languageCode}) async {
       await record.stop();
+      if (!context.mounted) return;
       context.read<VoiceRecordCubit>().setRecordingStatus(
             isRecording: false,
           );
