@@ -7,12 +7,26 @@ class VoiceRecordState extends Equatable {
   List<Object> get props => [];
 }
 
-final class VoiceRecordInitial extends VoiceRecordState {
+class VoiceRecordInitial extends VoiceRecordState {
   final bool isRecording;
   final String speechText;
+  final String translation;
+  final User userSpeaking;
 
-  const VoiceRecordInitial({required this.isRecording, this.speechText = ''});
+  const VoiceRecordInitial({
+    required this.isRecording,
+    this.speechText = '',
+    this.translation = '',
+    this.userSpeaking = User.host,
+  });
 
   @override
-  List<Object> get props => [isRecording, speechText];
+  List<Object> get props => [
+        isRecording,
+        speechText,
+        translation,
+        userSpeaking,
+      ];
 }
+
+class VoiceRecordLoading extends VoiceRecordState {}

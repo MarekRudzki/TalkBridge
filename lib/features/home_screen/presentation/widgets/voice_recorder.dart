@@ -7,41 +7,50 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_speech/google_speech.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
 import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 class VoiceRecorder extends StatelessWidget {
-  const VoiceRecorder({super.key});
+  final User currentUser;
+  const VoiceRecorder({
+    super.key,
+    required this.currentUser,
+  });
 
   @override
   Widget build(BuildContext context) {
     final record = Record();
 
     Future<void> startRecording() async {
-      context.read<VoiceRecordCubit>().setRecordingStatus(
-            isRecording: true,
-          );
+      final hasPermission = await record.hasPermission();
+      if (hasPermission) {
+        if (!context.mounted) return;
+        context.read<VoiceRecordCubit>().setRecordingStatus(
+              isRecording: true,
+            );
 
-      final directory = await getApplicationDocumentsDirectory();
-
-      if (await record.hasPermission()) {
+        final directory = await getApplicationDocumentsDirectory();
         await record.start(
           path: '${directory.path}/speech.wav',
           encoder: AudioEncoder.wav,
           bitRate: 12800,
         );
-      } else {
-        await record.stop();
       }
     }
 
-    Future<void> stopRecording({required String languageCode}) async {
-      await record.stop();
+    Future<void> stopRecording({
+      required String languageSource,
+      required String languageTarget,
+    }) async {
+      String transcription = '';
+
       if (!context.mounted) return;
       context.read<VoiceRecordCubit>().setRecordingStatus(
             isRecording: false,
           );
-
+      context.read<VoiceRecordCubit>().startLoading();
+      await record.stop();
       final serviceAccount = ServiceAccount.fromString(
         await rootBundle.loadString(
           'assets/talkbridge_service_account.json',
@@ -57,7 +66,8 @@ class VoiceRecorder extends StatelessWidget {
           enableAutomaticPunctuation: true,
           sampleRateHertz: 44100,
           audioChannelCount: 2,
-          languageCode: languageCode,
+          languageCode:
+              currentUser == User.host ? languageSource : languageTarget,
         ),
         interimResults: true,
       );
@@ -72,13 +82,18 @@ class VoiceRecorder extends StatelessWidget {
 
       final responseStream =
           speechToText.streamingRecognize(streamingConfig, audio);
-      responseStream.listen((data) {
-        final abc =
+      responseStream.listen((data) async {
+        transcription =
             data.results.map((e) => e.alternatives.first.transcript).join('\n');
-
-        context
-            .read<VoiceRecordCubit>()
-            .updateSpeechText(text: abc, isRecording: false);
+      }).onDone(() async {
+        await context.read<VoiceRecordCubit>().updateSpeechText(
+              text: transcription,
+              languageSource:
+                  currentUser == User.host ? languageSource : languageTarget,
+              languageTarget:
+                  currentUser == User.host ? languageTarget : languageSource,
+              userSpeaking: currentUser,
+            );
       });
     }
 
@@ -98,7 +113,11 @@ class VoiceRecorder extends StatelessWidget {
                   child: InkWell(
                     onTap: () => state.isRecording
                         ? stopRecording(
-                            languageCode: languageCubit.sourceLanguage)
+                            languageSource:
+                                languageCubit.sourceLanguage.substring(0, 2),
+                            languageTarget:
+                                languageCubit.targetLanguage.substring(0, 2),
+                          )
                         : startRecording(),
                     child: Container(
                       decoration: BoxDecoration(

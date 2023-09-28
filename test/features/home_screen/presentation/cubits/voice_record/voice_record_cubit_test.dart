@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 void main() {
@@ -29,10 +30,26 @@ void main() {
       blocTest<VoiceRecordCubit, VoiceRecordState>(
         'emits [VoiceRecordInitial] with correct data when updateSpeechText is triggered.',
         build: () => voiceRecordCubit,
-        act: (cubit) =>
-            cubit.updateSpeechText(isRecording: false, text: 'FooBar'),
+        act: (cubit) => cubit.updateSpeechText(
+            text: 'Ball',
+            languageSource: 'en',
+            languageTarget: 'pl',
+            userSpeaking: User.host),
         expect: () => [
-          const VoiceRecordInitial(isRecording: false, speechText: 'FooBar')
+          const VoiceRecordInitial(
+            isRecording: false,
+            speechText: 'Ball',
+            translation: 'Piłka',
+          )
+        ],
+      );
+
+      blocTest<VoiceRecordCubit, VoiceRecordState>(
+        'emits [VoiceRecordLoading] when startLoading is triggered.',
+        build: () => voiceRecordCubit,
+        act: (cubit) => cubit.startLoading(),
+        expect: () => [
+          VoiceRecordLoading(),
         ],
       );
     },
