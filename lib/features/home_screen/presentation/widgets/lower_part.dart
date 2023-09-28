@@ -126,7 +126,7 @@ class LowerPart extends StatelessWidget {
             padding: EdgeInsets.all(20),
             child: Align(
               alignment: Alignment.bottomRight,
-              child: VoiceRecorder(), //TODO change at upper
+              child: VoiceRecorder(),
             ),
           ),
         ],

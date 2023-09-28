@@ -31,6 +31,7 @@ void main() async {
         ],
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
+          title: 'TalkBridge',
           home: HomeScreen(),
         ),
       ),

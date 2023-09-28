@@ -5,6 +5,7 @@ import 'package:talkbridge/features/home_screen/presentation/cubits/language/lan
 import 'dart:math' as math;
 
 import 'package:talkbridge/features/home_screen/presentation/widgets/language_pick_screen.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/voice_recorder.dart';
 
 class UpperPart extends StatelessWidget {
   const UpperPart({super.key});
@@ -87,32 +88,11 @@ class UpperPart extends StatelessWidget {
                 )
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(20),
+            const Padding(
+              padding: EdgeInsets.all(20),
               child: Align(
                 alignment: Alignment.bottomRight,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.greenAccent,
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                      width: 8,
-                      color: Colors.white,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: InkWell(
-                      onTap: () {},
-                      child: const Icon(
-                        size: 45,
-                        color: Colors.white,
-                        Icons.keyboard_voice_outlined,
-                      ),
-                    ),
-                  ),
-                ),
+                child: VoiceRecorder(), //TODO should act differently than lower
               ),
             ),
           ],
