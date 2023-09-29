@@ -8,8 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_speech/google_speech.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:talkbridge/constants/enums.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
+
+import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 class VoiceRecorder extends StatelessWidget {
   final User currentUser;
@@ -40,8 +41,8 @@ class VoiceRecorder extends StatelessWidget {
     }
 
     Future<void> stopRecording({
-      required String languageSource,
-      required String languageTarget,
+      required String sourceLanguage,
+      required String targetLanguage,
     }) async {
       String transcription = '';
 
@@ -67,7 +68,7 @@ class VoiceRecorder extends StatelessWidget {
           sampleRateHertz: 44100,
           audioChannelCount: 2,
           languageCode:
-              currentUser == User.host ? languageSource : languageTarget,
+              currentUser == User.host ? sourceLanguage : targetLanguage,
         ),
         interimResults: true,
       );
@@ -88,18 +89,18 @@ class VoiceRecorder extends StatelessWidget {
       }).onDone(() async {
         await context.read<VoiceRecordCubit>().updateSpeechText(
               text: transcription,
-              languageSource:
-                  currentUser == User.host ? languageSource : languageTarget,
-              languageTarget:
-                  currentUser == User.host ? languageTarget : languageSource,
+              sourceLanguage:
+                  currentUser == User.host ? sourceLanguage : targetLanguage,
+              targetLanguage:
+                  currentUser == User.host ? targetLanguage : sourceLanguage,
               userSpeaking: currentUser,
             );
       });
     }
 
-    return BlocBuilder<LanguageCubit, LanguageState>(
-      builder: (context, languageCubit) {
-        if (languageCubit is LanguagesSelected) {
+    return BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
+      builder: (context, languagePickerState) {
+        if (languagePickerState is LanguagesSelected) {
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
             builder: (context, state) {
               if (state is VoiceRecordInitial) {
@@ -113,10 +114,10 @@ class VoiceRecorder extends StatelessWidget {
                   child: InkWell(
                     onTap: () => state.isRecording
                         ? stopRecording(
-                            languageSource:
-                                languageCubit.sourceLanguage.substring(0, 2),
-                            languageTarget:
-                                languageCubit.targetLanguage.substring(0, 2),
+                            sourceLanguage: languagePickerState.sourceLanguage
+                                .substring(0, 2),
+                            targetLanguage: languagePickerState.targetLanguage
+                                .substring(0, 2),
                           )
                         : startRecording(),
                     child: Container(
@@ -153,7 +154,28 @@ class VoiceRecorder extends StatelessWidget {
                   ),
                 );
               }
-              return const SizedBox.shrink();
+              return AvatarGlow(
+                endRadius: 45,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent,
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      width: 8,
+                      color: Colors.white,
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(
+                      size: 45,
+                      color: Colors.white,
+                      Icons.keyboard_voice_outlined,
+                    ),
+                  ),
+                ),
+              );
             },
           );
         }

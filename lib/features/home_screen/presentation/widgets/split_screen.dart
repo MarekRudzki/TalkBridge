@@ -2,15 +2,20 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:talkbridge/constants/enums.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/language/language_cubit.dart';
-import 'package:talkbridge/features/home_screen/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/languages_reverse.dart';
+import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
+
+import 'package:talkbridge/features/language_picker/presentation/widgets/language_pick_screen.dart';
+import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:talkbridge/features/voice_record/presentation/widgets/voice_recorder.dart';
 import 'dart:math' as math;
 
-import 'package:talkbridge/features/home_screen/presentation/widgets/language_pick_screen.dart';
-import 'package:talkbridge/features/home_screen/presentation/widgets/voice_recorder.dart';
-
-class UpperPart extends StatelessWidget {
-  const UpperPart({super.key});
+class SplitScreen extends StatelessWidget {
+  final User user;
+  const SplitScreen({
+    super.key,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +24,37 @@ class UpperPart extends StatelessWidget {
       required String speechText,
       required String translation,
     }) {
-      if (userSpeaking == User.guest) {
-        return speechText == '' ? '' : speechText;
+      if (user == User.host) {
+        if (userSpeaking == User.host) {
+          return speechText == '' ? '' : speechText;
+        } else {
+          return translation == '' ? '' : translation;
+        }
       } else {
-        return translation == '' ? '' : translation;
+        if (userSpeaking == User.guest) {
+          return speechText == '' ? '' : speechText;
+        } else {
+          return translation == '' ? '' : translation;
+        }
       }
     }
 
     return Expanded(
       child: Transform.rotate(
-        angle: -math.pi,
+        angle: user == User.host ? 0 : -math.pi,
         child: Stack(
           children: [
             Column(
               children: [
                 Expanded(
                   child: BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
-                    builder: (context, state) {
-                      if (state is VoiceRecordLoading) {
+                    builder: (context, voiceRecordState) {
+                      if (voiceRecordState is VoiceRecordLoading) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
                       }
-                      if (state is VoiceRecordInitial) {
+                      if (voiceRecordState is VoiceRecordInitial) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
@@ -50,10 +63,11 @@ class UpperPart extends StatelessWidget {
                           child: SingleChildScrollView(
                             child: Text(
                               displayText(
-                                userSpeaking: state.userSpeaking,
-                                speechText: state.speechText,
-                                translation: state.translation,
+                                userSpeaking: voiceRecordState.userSpeaking,
+                                speechText: voiceRecordState.speechText,
+                                translation: voiceRecordState.translation,
                               ),
+                              textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 18,
                               ),
@@ -73,11 +87,14 @@ class UpperPart extends StatelessWidget {
                       InkWell(
                         child: Padding(
                           padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<LanguageCubit, LanguageState>(
+                          child: BlocBuilder<LanguagePickerCubit,
+                              LanguagePickerState>(
                             builder: (context, state) {
                               if (state is LanguagesSelected) {
                                 return CountryFlag.fromCountryCode(
-                                  state.targetLanguage.substring(3, 5),
+                                  user == User.host
+                                      ? state.sourceLanguage.substring(3, 5)
+                                      : state.targetLanguage.substring(3, 5),
                                   height: 31.2,
                                   width: 40.3,
                                   borderRadius: 6,
@@ -104,11 +121,16 @@ class UpperPart extends StatelessWidget {
                       InkWell(
                         child: Padding(
                           padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<LanguageCubit, LanguageState>(
-                            builder: (context, state) {
-                              if (state is LanguagesSelected) {
+                          child: BlocBuilder<LanguagePickerCubit,
+                              LanguagePickerState>(
+                            builder: (context, languagePickerState) {
+                              if (languagePickerState is LanguagesSelected) {
                                 return CountryFlag.fromCountryCode(
-                                  state.sourceLanguage.substring(3, 5),
+                                  user == User.host
+                                      ? languagePickerState.targetLanguage
+                                          .substring(3, 5)
+                                      : languagePickerState.sourceLanguage
+                                          .substring(3, 5),
                                   height: 31.2,
                                   width: 40.3,
                                   borderRadius: 6,
@@ -122,23 +144,25 @@ class UpperPart extends StatelessWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => const LanguagePickScreen(
-                                  isSelectingSourceLng: false),
+                                isSelectingSourceLng: false,
+                              ),
                             ),
                           );
                         },
                       ),
+                      if (user == User.host) const LanguagesReverse(),
                       const Spacer(),
                     ],
                   ),
                 )
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.all(20),
+            Padding(
+              padding: const EdgeInsets.all(20),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: VoiceRecorder(
-                  currentUser: User.guest,
+                  currentUser: user,
                 ),
               ),
             ),

@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:talkbridge/features/home_screen/presentation/widgets/upper_part.dart';
-import 'package:talkbridge/features/home_screen/presentation/widgets/lower_part.dart';
+import 'package:talkbridge/constants/enums.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/no_network.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/split_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,48 +49,20 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Column(
               children: [
-                UpperPart(),
+                SplitScreen(
+                  user: User.guest,
+                ),
                 Divider(
                   color: Color.fromARGB(255, 213, 210, 210),
                   height: 2,
                   thickness: 8,
                 ),
-                LowerPart(),
+                SplitScreen(
+                  user: User.host,
+                ),
               ],
             ),
-            if (!hasInternet)
-              Container(
-                color: Colors.grey.withOpacity(0.8),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.wifi_off_outlined,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                    SizedBox(height: 40),
-                    Text(
-                      'No network connection',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Text(
-                        'Please turn on Internet and appliaction will refresh',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            if (!hasInternet) const NoNetwork(),
           ],
         ),
       ),

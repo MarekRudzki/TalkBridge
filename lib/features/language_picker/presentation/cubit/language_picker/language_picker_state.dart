@@ -1,13 +1,13 @@
-part of 'language_cubit.dart';
+part of 'language_picker_cubit.dart';
 
-class LanguageState extends Equatable {
+class LanguagePickerState extends Equatable {
   @override
   List<Object> get props => [];
 }
 
-class LanguageInitial extends LanguageState {}
+class LanguagePickerInitial extends LanguagePickerState {}
 
-class LanguagesSelected extends LanguageState {
+class LanguagesSelected extends LanguagePickerState {
   final String sourceLanguage;
   final String targetLanguage;
 

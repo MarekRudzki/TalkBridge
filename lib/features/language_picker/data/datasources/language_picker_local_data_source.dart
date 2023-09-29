@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-class LanguageLocalDataSource {
+class LanguagePickerLocalDataSource {
   final _languageBox = Hive.box('language_box');
 
   Future<void> setSourceLanguage({required String language}) async {
@@ -11,17 +11,17 @@ class LanguageLocalDataSource {
     await _languageBox.put('target_language', language);
   }
 
-  String getSourceLanguage() {
+  Future<String> getSourceLanguage() async {
     if (!_languageBox.containsKey('source_language')) {
-      setSourceLanguage(language: 'pl-PL');
+      await setSourceLanguage(language: 'pl-PL');
     }
     final String sourceLanguage = _languageBox.get('source_language');
     return sourceLanguage;
   }
 
-  String getTargetLanguage() {
+  Future<String> getTargetLanguage() async {
     if (!_languageBox.containsKey('target_language')) {
-      setTargetLanguage(language: 'en-GB');
+      await setTargetLanguage(language: 'en-GB');
     }
     final String targetLanguage = _languageBox.get('target_language');
     return targetLanguage;
