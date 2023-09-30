@@ -3,166 +3,210 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/languages_reverse.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/captured_text.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/text_to_speech.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
 
-import 'package:talkbridge/features/language_picker/presentation/widgets/language_pick_screen.dart';
+import 'package:talkbridge/features/language_picker/presentation/language_pick_screen.dart';
+import 'package:talkbridge/features/user_settings/presentation/user_settings_screen.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/widgets/voice_recorder.dart';
 import 'dart:math' as math;
 
 class SplitScreen extends StatelessWidget {
-  final User user;
+  final User userScreen;
   const SplitScreen({
     super.key,
-    required this.user,
+    required this.userScreen,
   });
 
   @override
   Widget build(BuildContext context) {
-    String displayText({
-      required User userSpeaking,
-      required String speechText,
-      required String translation,
-    }) {
-      if (user == User.host) {
-        if (userSpeaking == User.host) {
-          return speechText == '' ? '' : speechText;
-        } else {
-          return translation == '' ? '' : translation;
-        }
-      } else {
-        if (userSpeaking == User.guest) {
-          return speechText == '' ? '' : speechText;
-        } else {
-          return translation == '' ? '' : translation;
-        }
-      }
-    }
-
     return Expanded(
       child: Transform.rotate(
-        angle: user == User.host ? 0 : -math.pi,
+        angle: userScreen == User.host ? 0 : -math.pi,
         child: Stack(
           children: [
-            Column(
+            Row(
               children: [
+                Container(
+                  height: double.infinity,
+                  width: 10,
+                  color: const Color.fromARGB(255, 213, 210, 210),
+                ),
                 Expanded(
-                  child: BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
-                    builder: (context, voiceRecordState) {
-                      if (voiceRecordState is VoiceRecordLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (voiceRecordState is VoiceRecordInitial) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 20,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Text(
-                              displayText(
-                                userSpeaking: voiceRecordState.userSpeaking,
-                                speechText: voiceRecordState.speechText,
-                                translation: voiceRecordState.translation,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
+                          builder: (context, voiceRecordState) {
+                            if (voiceRecordState is VoiceRecordLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (voiceRecordState is VoiceRecordInitial) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 10,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CapturedText(
+                                      speechText: voiceRecordState.speechText,
+                                      translation: voiceRecordState.translation,
+                                      userSpeaking:
+                                          voiceRecordState.userSpeaking,
+                                      userScreenType: userScreen,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return const Text('');
+                          },
+                        ),
+                      ),
+                      Container(
+                        color: const Color.fromARGB(255, 213, 210, 210),
+                        child: Row(
+                          children: [
+                            InkWell(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
+                                child: BlocBuilder<LanguagePickerCubit,
+                                    LanguagePickerState>(
+                                  builder: (context, state) {
+                                    if (state is LanguagesSelected) {
+                                      return CountryFlag.fromCountryCode(
+                                        userScreen == User.host
+                                            ? state.sourceLanguage
+                                                .substring(3, 5)
+                                            : state.targetLanguage
+                                                .substring(3, 5),
+                                        height: 31.2,
+                                        width: 40.3,
+                                        borderRadius: 6,
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 18,
-                              ),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LanguagePickScreen(
+                                            isSelectingSourceLng: true),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
-                        );
-                      }
-                      return const Text('');
-                    },
+                            const Icon(
+                              Icons.arrow_right_alt,
+                              color: Colors.white,
+                              size: 50,
+                            ),
+                            InkWell(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
+                                child: BlocBuilder<LanguagePickerCubit,
+                                    LanguagePickerState>(
+                                  builder: (context, languagePickerState) {
+                                    if (languagePickerState
+                                        is LanguagesSelected) {
+                                      return CountryFlag.fromCountryCode(
+                                        userScreen == User.host
+                                            ? languagePickerState.targetLanguage
+                                                .substring(3, 5)
+                                            : languagePickerState.sourceLanguage
+                                                .substring(3, 5),
+                                        height: 31.2,
+                                        width: 40.3,
+                                        borderRadius: 6,
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  },
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LanguagePickScreen(
+                                      isSelectingSourceLng: false,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (userScreen == User.host)
+                              const LanguagesReverse(),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 Container(
+                  height: double.infinity,
+                  width: 50,
                   color: const Color.fromARGB(255, 213, 210, 210),
-                  child: Row(
+                  child: Column(
                     children: [
-                      const SizedBox(width: 15),
-                      InkWell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<LanguagePickerCubit,
-                              LanguagePickerState>(
-                            builder: (context, state) {
-                              if (state is LanguagesSelected) {
-                                return CountryFlag.fromCountryCode(
-                                  user == User.host
-                                      ? state.sourceLanguage.substring(3, 5)
-                                      : state.targetLanguage.substring(3, 5),
-                                  height: 31.2,
-                                  width: 40.3,
-                                  borderRadius: 6,
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
+                      TextToSpeech(
+                        userScreen: userScreen,
+                        speechSpeed: 0.5,
+                        iconWidget: const Icon(
+                          Icons.record_voice_over_outlined,
+                          color: Colors.white,
+                          size: 25,
                         ),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const LanguagePickScreen(
-                                  isSelectingSourceLng: true),
-                            ),
-                          );
-                        },
                       ),
-                      const Icon(
-                        Icons.arrow_right_alt,
-                        color: Colors.white,
-                        size: 50,
-                      ),
-                      InkWell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: BlocBuilder<LanguagePickerCubit,
-                              LanguagePickerState>(
-                            builder: (context, languagePickerState) {
-                              if (languagePickerState is LanguagesSelected) {
-                                return CountryFlag.fromCountryCode(
-                                  user == User.host
-                                      ? languagePickerState.targetLanguage
-                                          .substring(3, 5)
-                                      : languagePickerState.sourceLanguage
-                                          .substring(3, 5),
-                                  height: 31.2,
-                                  width: 40.3,
-                                  borderRadius: 6,
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
+                      TextToSpeech(
+                        userScreen: userScreen,
+                        speechSpeed: 0.25,
+                        iconWidget: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Image.asset('assets/turtle.png', scale: 5),
                         ),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const LanguagePickScreen(
-                                isSelectingSourceLng: false,
+                      ),
+                      if (userScreen == User.host)
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const UserSettingsScreen(),
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                      if (user == User.host) const LanguagesReverse(),
-                      const Spacer(),
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.settings,
+                            color: Colors.white,
+                          ),
+                        ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(0, 10, 5, 5),
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: VoiceRecorder(
-                  currentUser: user,
+                  currentUser: userScreen,
                 ),
               ),
             ),
