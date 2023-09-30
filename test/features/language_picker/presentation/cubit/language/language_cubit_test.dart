@@ -24,7 +24,7 @@ void main() {
   });
 
   group(
-    'home screen',
+    'Language picker cubit',
     () {
       blocTest<LanguagePickerCubit, LanguagePickerState>(
         'emits [LanguageSelected] with correct values when setSourceLanguage is triggered.',

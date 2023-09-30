@@ -43,27 +43,59 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            const Column(
-              children: [
-                SplitScreen(
-                  user: User.guest,
+      child: WillPopScope(
+        onWillPop: () async {
+          final bool? exitResult = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Please confirm'),
+              content: const Text('Do you want to exit the app?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text(
+                    'No',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
-                Divider(
-                  color: Color.fromARGB(255, 213, 210, 210),
-                  height: 2,
-                  thickness: 8,
-                ),
-                SplitScreen(
-                  user: User.host,
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text(
+                    'Yes',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
               ],
             ),
-            if (!hasInternet) const NoNetwork(),
-          ],
+          );
+          return exitResult ?? false;
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              const Column(
+                children: [
+                  SplitScreen(
+                    userScreen: User.guest,
+                  ),
+                  Divider(
+                    color: Color.fromARGB(255, 213, 210, 210),
+                    height: 2,
+                    thickness: 8,
+                  ),
+                  SplitScreen(
+                    userScreen: User.host,
+                  ),
+                ],
+              ),
+              if (!hasInternet) const NoNetwork(),
+            ],
+          ),
         ),
       ),
     );

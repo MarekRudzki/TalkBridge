@@ -41,7 +41,8 @@ class LanguagePickScreen extends StatelessWidget {
       'Slovak': 'sk-SK',
       'Slovenian': 'sl-SI',
       'Spanish': 'es-ES',
-      'Turkish': 'tr-TR'
+      'Turkish': 'tr-TR',
+      'Ukrainian': 'uk-UA',
     };
 
     List<String> availableLanguagesKeys = [];
@@ -148,20 +149,23 @@ class LanguagePickScreen extends StatelessWidget {
                                       children: [
                                         const SizedBox(width: 10),
                                         Padding(
-                                          padding: const EdgeInsets.all(15),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 11,
+                                            horizontal: 15,
+                                          ),
                                           child: CountryFlag.fromCountryCode(
                                             availableLanguagesValues
                                                 .map((e) => e.substring(3, 5))
                                                 .toList()[index],
-                                            height: 38.4,
-                                            width: 49.6,
+                                            height: 30.7,
+                                            width: 39.7,
                                             borderRadius: 8,
                                           ),
                                         ),
                                         const SizedBox(width: 10),
                                         Text(
                                           style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.w500,
                                           ),
                                           availableLanguagesKeys
