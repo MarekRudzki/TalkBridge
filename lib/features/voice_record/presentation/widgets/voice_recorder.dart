@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:avatar_glow/avatar_glow.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:record/record.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,8 +10,10 @@ import 'package:google_speech/google_speech.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
+import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:translator_plus/translator_plus.dart';
 
 class VoiceRecorder extends StatelessWidget {
   final User currentUser;
@@ -28,7 +31,9 @@ class VoiceRecorder extends StatelessWidget {
       if (hasPermission) {
         if (!context.mounted) return;
         context.read<VoiceRecordCubit>().setRecordingStatus(
-              isRecording: true,
+              recordingUser: currentUser == User.host
+                  ? RecordingUser.host
+                  : RecordingUser.guest,
             );
 
         final directory = await getApplicationDocumentsDirectory();
@@ -43,12 +48,13 @@ class VoiceRecorder extends StatelessWidget {
     Future<void> stopRecording({
       required String sourceLanguage,
       required String targetLanguage,
+      required bool isAutoPlay,
     }) async {
       String transcription = '';
 
       if (!context.mounted) return;
       context.read<VoiceRecordCubit>().setRecordingStatus(
-            isRecording: false,
+            recordingUser: RecordingUser.none,
           );
       context.read<VoiceRecordCubit>().startLoading();
       await record.stop();
@@ -59,7 +65,6 @@ class VoiceRecorder extends StatelessWidget {
       );
 
       final speechToText = SpeechToText.viaServiceAccount(serviceAccount);
-
       final streamingConfig = StreamingRecognitionConfig(
         config: RecognitionConfig(
           encoding: AudioEncoding.LINEAR16,
@@ -83,18 +88,43 @@ class VoiceRecorder extends StatelessWidget {
 
       final responseStream =
           speechToText.streamingRecognize(streamingConfig, audio);
+
       responseStream.listen((data) async {
         transcription =
             data.results.map((e) => e.alternatives.first.transcript).join('\n');
       }).onDone(() async {
-        await context.read<VoiceRecordCubit>().updateSpeechText(
-              text: transcription,
-              sourceLanguage:
-                  currentUser == User.host ? sourceLanguage : targetLanguage,
-              targetLanguage:
-                  currentUser == User.host ? targetLanguage : sourceLanguage,
-              userSpeaking: currentUser,
+        if (transcription.isEmpty) {
+          context.read<VoiceRecordCubit>().displayErrorMessage(
+                sourceLanguage: sourceLanguage,
+                userSpeaking: currentUser,
+              );
+        } else {
+          await context.read<VoiceRecordCubit>().updateSpeechText(
+                text: transcription,
+                sourceLanguage:
+                    currentUser == User.host ? sourceLanguage : targetLanguage,
+                targetLanguage:
+                    currentUser == User.host ? targetLanguage : sourceLanguage,
+                userSpeaking: currentUser,
+              );
+          if (isAutoPlay) {
+            FlutterTts ftts = FlutterTts();
+            final translator = GoogleTranslator();
+            await ftts.setPitch(1);
+            await ftts.setVolume(1.0);
+            await ftts.setSpeechRate(0.5);
+            await ftts.setLanguage(
+                currentUser == User.host ? targetLanguage : sourceLanguage);
+
+            var translation = await translator.translate(
+              transcription,
+              from: currentUser == User.host ? sourceLanguage : targetLanguage,
+              to: currentUser == User.host ? targetLanguage : sourceLanguage,
             );
+
+            await ftts.speak(translation.text);
+          }
+        }
       });
     }
 
@@ -104,76 +134,83 @@ class VoiceRecorder extends StatelessWidget {
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
             builder: (context, state) {
               if (state is VoiceRecordInitial) {
-                return AvatarGlow(
-                  endRadius: 45,
-                  animate: state.isRecording,
-                  glowColor: Colors.red,
-                  repeat: true,
-                  duration: const Duration(milliseconds: 2000),
-                  repeatPauseDuration: const Duration(milliseconds: 100),
-                  child: InkWell(
-                    onTap: () => state.isRecording
-                        ? stopRecording(
-                            sourceLanguage: languagePickerState.sourceLanguage
-                                .substring(0, 2),
-                            targetLanguage: languagePickerState.targetLanguage
-                                .substring(0, 2),
-                          )
-                        : startRecording(),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: state.isRecording
-                            ? Colors.white
-                            : Colors.greenAccent,
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(
-                          width: 8,
-                          color: Colors.white,
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                      child: AvatarGlow(
-                        endRadius: 30,
-                        animate: state.isRecording,
-                        glowColor: Colors.red,
-                        repeat: true,
-                        duration: const Duration(milliseconds: 2000),
-                        repeatPauseDuration: const Duration(milliseconds: 100),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(
-                            size: 45,
-                            color: state.isRecording
-                                ? Colors.greenAccent
-                                : Colors.white,
-                            Icons.keyboard_voice_outlined,
+                bool shouldAnimate() {
+                  if ((currentUser == User.host &&
+                          state.recordingUser == RecordingUser.host) ||
+                      (currentUser == User.guest &&
+                          state.recordingUser == RecordingUser.guest)) {
+                    return true;
+                  } else {
+                    return false;
+                  }
+                }
+
+                return BlocBuilder<UserSettingsCubit, UserSettingsState>(
+                  builder: (context, userSettingsState) {
+                    if (userSettingsState is UserSettingsInitial) {
+                      return InkWell(
+                        onTap: () async {
+                          if (state.recordingUser != RecordingUser.none) {
+                            await stopRecording(
+                              sourceLanguage: languagePickerState.sourceLanguage
+                                  .substring(0, 2),
+                              targetLanguage: languagePickerState.targetLanguage
+                                  .substring(0, 2),
+                              isAutoPlay: userSettingsState.isAutoPlay,
+                            );
+                          } else {
+                            await startRecording();
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: shouldAnimate()
+                                ? Colors.white
+                                : Colors.greenAccent,
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(
+                              width: 8,
+                              color: Colors.white,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          child: AvatarGlow(
+                            endRadius: 30,
+                            animate: shouldAnimate(),
+                            glowColor: Colors.red,
+                            repeat: true,
+                            duration: const Duration(milliseconds: 2000),
+                            repeatPauseDuration:
+                                const Duration(milliseconds: 100),
+                            child: Icon(
+                              size: 45,
+                              color: shouldAnimate()
+                                  ? Colors.greenAccent
+                                  : Colors.white,
+                              Icons.keyboard_voice_outlined,
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 );
               }
-              return AvatarGlow(
-                endRadius: 45,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.greenAccent,
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                      width: 8,
-                      color: Colors.white,
-                      style: BorderStyle.solid,
-                    ),
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.greenAccent,
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                    width: 8,
+                    color: Colors.white,
+                    style: BorderStyle.solid,
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(
-                      size: 45,
-                      color: Colors.white,
-                      Icons.keyboard_voice_outlined,
-                    ),
-                  ),
+                ),
+                child: const Icon(
+                  size: 55,
+                  color: Colors.white,
+                  Icons.keyboard_voice_outlined,
                 ),
               );
             },

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
+import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 class CapturedText extends StatelessWidget {
@@ -44,38 +45,53 @@ class CapturedText extends StatelessWidget {
         if (languagePickerState is LanguagesSelected) {
           return Expanded(
             child: SingleChildScrollView(
-              child: TextField(
-                controller: TextEditingController()
-                  ..text = displayInitialText()
-                  ..selection = TextSelection.collapsed(
-                      offset: displayInitialText().length),
-                keyboardType: TextInputType.text,
-                maxLines: 7,
-                cursorColor: Colors.greenAccent,
-                decoration: const InputDecoration(
-                  hintText: 'Start typing or use microphone',
-                  border: InputBorder.none,
-                ),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                ),
-                onChanged: (value) {
-                  if (debounce?.isActive ?? false) debounce?.cancel();
-                  debounce = Timer(const Duration(milliseconds: 1700), () {
-                    if (value == '') {
-                      context.read<VoiceRecordCubit>().setInitialState();
-                    } else {
-                      context.read<VoiceRecordCubit>().updateSpeechText(
-                            text: value,
-                            sourceLanguage: languagePickerState.sourceLanguage
-                                .substring(0, 2),
-                            targetLanguage: languagePickerState.targetLanguage
-                                .substring(0, 2),
-                            userSpeaking: userSpeaking,
-                          );
-                    }
-                  });
+              child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
+                builder: (context, state) {
+                  if (state is UserSettingsInitial) {
+                    return TextField(
+                      controller: TextEditingController()
+                        ..text = displayInitialText()
+                        ..selection = TextSelection.collapsed(
+                            offset: displayInitialText().length),
+                      keyboardType: TextInputType.text,
+                      maxLines: 7,
+                      cursorColor: Colors.greenAccent,
+                      decoration: const InputDecoration(
+                        hintText: 'Start typing or use microphone',
+                        border: InputBorder.none,
+                      ),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:
+                            context.read<UserSettingsCubit>().getFontSize() + 1,
+                      ),
+                      onChanged: (value) {
+                        if (debounce?.isActive ?? false) debounce?.cancel();
+                        debounce = Timer(
+                          const Duration(milliseconds: 1700),
+                          () {
+                            if (value == '') {
+                              context
+                                  .read<VoiceRecordCubit>()
+                                  .setInitialState();
+                            } else {
+                              context.read<VoiceRecordCubit>().updateSpeechText(
+                                    text: value,
+                                    sourceLanguage: languagePickerState
+                                        .sourceLanguage
+                                        .substring(0, 2),
+                                    targetLanguage: languagePickerState
+                                        .targetLanguage
+                                        .substring(0, 2),
+                                    userSpeaking: userSpeaking,
+                                  );
+                            }
+                          },
+                        );
+                      },
+                    );
+                  }
+                  return const SizedBox.shrink();
                 },
               ),
             ),

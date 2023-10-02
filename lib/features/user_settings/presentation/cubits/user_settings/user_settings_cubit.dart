@@ -59,4 +59,28 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
       ),
     );
   }
+
+  double getFontSize() {
+    final userSettingsState = state as UserSettingsInitial;
+
+    if (userSettingsState.fontSize == SelectedFontSize.small) {
+      return 16;
+    } else if (userSettingsState.fontSize == SelectedFontSize.medium) {
+      return 19;
+    } else {
+      return 22;
+    }
+  }
+
+  double getSliderValue() {
+    final userSettingsState = state as UserSettingsInitial;
+
+    if (userSettingsState.fontSize == SelectedFontSize.small) {
+      return 0;
+    } else if (userSettingsState.fontSize == SelectedFontSize.medium) {
+      return 0.5;
+    } else {
+      return 1;
+    }
+  }
 }

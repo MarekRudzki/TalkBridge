@@ -38,20 +38,21 @@ class SplitScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Expanded(
-                        child: BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
-                          builder: (context, voiceRecordState) {
-                            if (voiceRecordState is VoiceRecordLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                            if (voiceRecordState is VoiceRecordInitial) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 10,
-                                ),
-                                child: Row(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 10,
+                          ),
+                          child:
+                              BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
+                            builder: (context, voiceRecordState) {
+                              if (voiceRecordState is VoiceRecordLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              if (voiceRecordState is VoiceRecordInitial) {
+                                return Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CapturedText(
@@ -62,11 +63,11 @@ class SplitScreen extends StatelessWidget {
                                       userScreenType: userScreen,
                                     ),
                                   ],
-                                ),
-                              );
-                            }
-                            return const Text('');
-                          },
+                                );
+                              }
+                              return const Text('');
+                            },
+                          ),
                         ),
                       ),
                       Container(
@@ -201,15 +202,25 @@ class SplitScreen extends StatelessWidget {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 5, 5),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: VoiceRecorder(
-                  currentUser: userScreen,
-                ),
-              ),
-            ),
+            userScreen == User.host
+                ? const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: VoiceRecorder(
+                        currentUser: User.host,
+                      ),
+                    ),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: VoiceRecorder(
+                        currentUser: User.guest,
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
