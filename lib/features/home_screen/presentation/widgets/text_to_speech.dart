@@ -35,19 +35,19 @@ class TextToSpeech extends StatelessWidget {
                       await ftts.setSpeechRate(speechSpeed);
                       await ftts.setLanguage(
                         userScreen == User.host
-                            ? languagePickerState.targetLanguage
-                            : languagePickerState.sourceLanguage,
+                            ? languagePickerState.sourceLanguage
+                            : languagePickerState.targetLanguage,
                       );
 
                       await ftts.speak(
                         userScreen == User.host
-                            ? voiceRecordState.translation
-                            : voiceRecordState.speechText,
+                            ? voiceRecordState.speechText
+                            : voiceRecordState.translation,
                       );
                     },
                   );
                 }
-                return const SizedBox.shrink();
+                return iconWidget;
               },
             );
           }

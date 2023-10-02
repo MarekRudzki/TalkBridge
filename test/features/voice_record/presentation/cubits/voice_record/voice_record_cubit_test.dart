@@ -16,15 +16,20 @@ void main() {
       blocTest<VoiceRecordCubit, VoiceRecordState>(
         'emits [VoiceRecordInitial] with isRecording true value when toggleRecording is triggered.',
         build: () => voiceRecordCubit,
-        act: (cubit) => cubit.setRecordingStatus(isRecording: true),
-        expect: () => [const VoiceRecordInitial(isRecording: true)],
+        act: (cubit) =>
+            cubit.setRecordingStatus(recordingUser: RecordingUser.host),
+        expect: () => [
+          const VoiceRecordInitial(recordingUser: RecordingUser.host),
+        ],
       );
 
       blocTest<VoiceRecordCubit, VoiceRecordState>(
         'emits [VoiceRecordInitial] with isRecording false value when toggleRecording is triggered.',
         build: () => voiceRecordCubit,
-        act: (cubit) => cubit.setRecordingStatus(isRecording: false),
-        expect: () => [const VoiceRecordInitial(isRecording: false)],
+        act: (cubit) =>
+            cubit.setRecordingStatus(recordingUser: RecordingUser.none),
+        expect: () =>
+            [const VoiceRecordInitial(recordingUser: RecordingUser.none)],
       );
 
       blocTest<VoiceRecordCubit, VoiceRecordState>(
@@ -36,8 +41,9 @@ void main() {
             targetLanguage: 'pl',
             userSpeaking: User.host),
         expect: () => [
+          VoiceRecordLoading(),
           const VoiceRecordInitial(
-            isRecording: false,
+            recordingUser: RecordingUser.none,
             speechText: 'Ball',
             translation: 'Piłka',
           )
@@ -58,7 +64,7 @@ void main() {
         build: () => voiceRecordCubit,
         act: (cubit) => cubit.setInitialState(),
         expect: () => [
-          const VoiceRecordInitial(isRecording: false),
+          const VoiceRecordInitial(recordingUser: RecordingUser.none),
         ],
       );
 
@@ -71,9 +77,24 @@ void main() {
         ),
         expect: () => [
           const VoiceRecordInitial(
-            isRecording: false,
+            recordingUser: RecordingUser.none,
             speechText: 'Testowanie',
             translation: 'Testing',
+          ),
+        ],
+      );
+
+      blocTest<VoiceRecordCubit, VoiceRecordState>(
+        'emits [VoiceRecordInitial] when displayErrorMessage is triggered.',
+        build: () => voiceRecordCubit,
+        act: (cubit) => cubit.displayErrorMessage(
+          sourceLanguage: 'pl',
+          userSpeaking: User.host,
+        ),
+        expect: () => [
+          const VoiceRecordInitial(
+            recordingUser: RecordingUser.none,
+            speechText: 'Wykrywanie mowy nie powiodło się.',
           ),
         ],
       );

@@ -38,7 +38,11 @@ class LanguagesReverse extends StatelessWidget {
                   ),
                 );
               }
-              return const SizedBox.shrink();
+              return const Icon(
+                Icons.cached,
+                color: Colors.white,
+                size: 33,
+              );
             },
           );
         }

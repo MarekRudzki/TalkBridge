@@ -8,13 +8,13 @@ class VoiceRecordState extends Equatable {
 }
 
 class VoiceRecordInitial extends VoiceRecordState {
-  final bool isRecording;
+  final RecordingUser recordingUser;
   final String speechText;
   final String translation;
   final User userSpeaking;
 
   const VoiceRecordInitial({
-    required this.isRecording,
+    required this.recordingUser,
     this.speechText = '',
     this.translation = '',
     this.userSpeaking = User.host,
@@ -22,7 +22,7 @@ class VoiceRecordInitial extends VoiceRecordState {
 
   @override
   List<Object> get props => [
-        isRecording,
+        recordingUser,
         speechText,
         translation,
         userSpeaking,

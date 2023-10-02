@@ -7,11 +7,12 @@ import 'package:translator_plus/translator_plus.dart';
 part 'voice_record_state.dart';
 
 class VoiceRecordCubit extends Cubit<VoiceRecordState> {
-  VoiceRecordCubit() : super(const VoiceRecordInitial(isRecording: false));
+  VoiceRecordCubit()
+      : super(const VoiceRecordInitial(recordingUser: RecordingUser.none));
 
-  void setRecordingStatus({required bool isRecording}) {
+  void setRecordingStatus({required RecordingUser recordingUser}) {
     emit(
-      VoiceRecordInitial(isRecording: isRecording),
+      VoiceRecordInitial(recordingUser: recordingUser),
     );
   }
 
@@ -21,7 +22,27 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
 
   void setInitialState() {
     emit(
-      const VoiceRecordInitial(isRecording: false),
+      const VoiceRecordInitial(recordingUser: RecordingUser.none),
+    );
+  }
+
+  Future<void> displayErrorMessage({
+    required String sourceLanguage,
+    required User userSpeaking,
+  }) async {
+    final translator = GoogleTranslator();
+    var errorMessage = await translator.translate(
+      'Speech detection failed.',
+      from: 'en',
+      to: sourceLanguage,
+    );
+
+    emit(
+      VoiceRecordInitial(
+        speechText: errorMessage.text,
+        recordingUser: RecordingUser.none,
+        userSpeaking: userSpeaking,
+      ),
     );
   }
 
@@ -42,7 +63,7 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
     emit(
       VoiceRecordInitial(
         speechText: text.capitalize(),
-        isRecording: false,
+        recordingUser: RecordingUser.none,
         translation: translation.text.capitalize(),
         userSpeaking: userSpeaking,
       ),
@@ -55,7 +76,7 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
   }) {
     emit(
       VoiceRecordInitial(
-        isRecording: false,
+        recordingUser: RecordingUser.none,
         speechText: translation,
         translation: speechText,
       ),
