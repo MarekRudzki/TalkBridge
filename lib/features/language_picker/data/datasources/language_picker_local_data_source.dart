@@ -15,7 +15,7 @@ class LanguagePickerLocalDataSource {
     if (!_languageBox.containsKey('source_language')) {
       await setSourceLanguage(language: 'pl-PL');
     }
-    final String sourceLanguage = _languageBox.get('source_language');
+    final String sourceLanguage = _languageBox.get('source_language') as String;
     return sourceLanguage;
   }
 
@@ -23,7 +23,7 @@ class LanguagePickerLocalDataSource {
     if (!_languageBox.containsKey('target_language')) {
       await setTargetLanguage(language: 'en-GB');
     }
-    final String targetLanguage = _languageBox.get('target_language');
+    final String targetLanguage = _languageBox.get('target_language') as String;
     return targetLanguage;
   }
 }

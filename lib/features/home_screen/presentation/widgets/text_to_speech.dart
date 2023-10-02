@@ -33,7 +33,7 @@ class TextToSpeech extends StatelessWidget {
                       child: iconWidget,
                     ),
                     onTap: () async {
-                      FlutterTts ftts = FlutterTts();
+                      final FlutterTts ftts = FlutterTts();
                       await ftts.setPitch(1);
                       await ftts.setVolume(1.0);
                       await ftts.setSpeechRate(speechSpeed);

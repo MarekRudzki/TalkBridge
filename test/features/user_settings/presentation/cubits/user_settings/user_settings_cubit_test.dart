@@ -76,7 +76,6 @@ void main() {
         act: (cubit) => cubit.getUserSettings(),
         expect: () => [
           const UserSettingsInitial(
-            isAutoPlay: true,
             fontSize: SelectedFontSize.large,
             interfaceLanguage: SelectedInterfaceLanguage.polish,
           ),

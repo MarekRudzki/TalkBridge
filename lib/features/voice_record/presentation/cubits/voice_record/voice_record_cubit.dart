@@ -31,7 +31,7 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
     required User userSpeaking,
   }) async {
     final translator = GoogleTranslator();
-    var errorMessage = await translator.translate(
+    final errorMessage = await translator.translate(
       'Speech detection failed.',
       from: 'en',
       to: sourceLanguage,
@@ -54,7 +54,7 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
   }) async {
     emit(VoiceRecordLoading());
     final translator = GoogleTranslator();
-    var translation = await translator.translate(
+    final translation = await translator.translate(
       text,
       from: sourceLanguage,
       to: targetLanguage,

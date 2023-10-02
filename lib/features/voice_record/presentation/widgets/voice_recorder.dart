@@ -68,7 +68,6 @@ class VoiceRecorder extends StatelessWidget {
       final streamingConfig = StreamingRecognitionConfig(
         config: RecognitionConfig(
           encoding: AudioEncoding.LINEAR16,
-          model: RecognitionModel.basic,
           enableAutomaticPunctuation: true,
           sampleRateHertz: 44100,
           audioChannelCount: 2,
@@ -109,7 +108,7 @@ class VoiceRecorder extends StatelessWidget {
                 userSpeaking: currentUser,
               );
           if (isAutoPlay) {
-            FlutterTts ftts = FlutterTts();
+            final FlutterTts ftts = FlutterTts();
             final translator = GoogleTranslator();
             await ftts.setPitch(1);
             await ftts.setVolume(1.0);
@@ -117,7 +116,7 @@ class VoiceRecorder extends StatelessWidget {
             await ftts.setLanguage(
                 currentUser == User.host ? targetLanguage : sourceLanguage);
 
-            var translation = await translator.translate(
+            final translation = await translator.translate(
               transcription,
               from: currentUser == User.host ? sourceLanguage : targetLanguage,
               to: currentUser == User.host ? targetLanguage : sourceLanguage,
@@ -172,17 +171,12 @@ class VoiceRecorder extends StatelessWidget {
                             border: Border.all(
                               width: 8,
                               color: Colors.white,
-                              style: BorderStyle.solid,
                             ),
                           ),
                           child: AvatarGlow(
                             endRadius: 30,
                             animate: shouldAnimate(),
                             glowColor: Colors.red,
-                            repeat: true,
-                            duration: const Duration(milliseconds: 2000),
-                            repeatPauseDuration:
-                                const Duration(milliseconds: 100),
                             child: Icon(
                               size: 45,
                               color: shouldAnimate()
@@ -206,7 +200,6 @@ class VoiceRecorder extends StatelessWidget {
                   border: Border.all(
                     width: 8,
                     color: Colors.white,
-                    style: BorderStyle.solid,
                   ),
                 ),
                 child: const Icon(

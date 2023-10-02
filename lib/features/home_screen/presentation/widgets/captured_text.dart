@@ -49,14 +49,14 @@ class CapturedText extends StatelessWidget {
       required String targetLanguage,
     }) async {
       if (userScreenType == User.host) {
-        var translation = await translator.translate(
+        final translation = await translator.translate(
           'Start typing or use microphone',
           from: 'en',
           to: sourceLanguage,
         );
         return translation.text;
       } else {
-        var translation = await translator.translate(
+        final translation = await translator.translate(
           'Use microphone',
           from: 'en',
           to: targetLanguage,
@@ -81,13 +81,13 @@ class CapturedText extends StatelessWidget {
               userSpeaking: userSpeaking,
             );
 
-        var translation = await translator.translate(
+        final translation = await translator.translate(
           text,
           from: sourceLanguage.substring(0, 2),
           to: targetLangauge.substring(0, 2),
         );
 
-        FlutterTts ftts = FlutterTts();
+        final FlutterTts ftts = FlutterTts();
         await ftts.setPitch(1);
         await ftts.setVolume(1.0);
         await ftts.setSpeechRate(0.5);

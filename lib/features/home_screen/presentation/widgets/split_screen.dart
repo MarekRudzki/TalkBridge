@@ -202,25 +202,26 @@ class SplitScreen extends StatelessWidget {
                 ),
               ],
             ),
-            userScreen == User.host
-                ? const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: VoiceRecorder(
-                        currentUser: User.host,
-                      ),
-                    ),
-                  )
-                : const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: VoiceRecorder(
-                        currentUser: User.guest,
-                      ),
-                    ),
+            if (userScreen == User.host)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: VoiceRecorder(
+                    currentUser: User.host,
                   ),
+                ),
+              )
+            else
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 15, 15),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: VoiceRecorder(
+                    currentUser: User.guest,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
