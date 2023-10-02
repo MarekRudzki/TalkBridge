@@ -18,16 +18,20 @@ class TextToSpeech extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      child: BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
-        builder: (context, languagePickerState) {
-          if (languagePickerState is LanguagesSelected) {
-            return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
-              builder: (context, voiceRecordState) {
-                if (voiceRecordState is VoiceRecordInitial) {
-                  return InkWell(
-                    child: iconWidget,
+    return BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
+      builder: (context, languagePickerState) {
+        if (languagePickerState is LanguagesSelected) {
+          return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
+            builder: (context, voiceRecordState) {
+              if (voiceRecordState is VoiceRecordInitial) {
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: iconWidget,
+                    ),
                     onTap: () async {
                       FlutterTts ftts = FlutterTts();
                       await ftts.setPitch(1);
@@ -45,15 +49,15 @@ class TextToSpeech extends StatelessWidget {
                             : voiceRecordState.translation,
                       );
                     },
-                  );
-                }
-                return iconWidget;
-              },
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+                  ),
+                );
+              }
+              return iconWidget;
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

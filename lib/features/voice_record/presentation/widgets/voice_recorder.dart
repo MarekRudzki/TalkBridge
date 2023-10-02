@@ -95,7 +95,8 @@ class VoiceRecorder extends StatelessWidget {
       }).onDone(() async {
         if (transcription.isEmpty) {
           context.read<VoiceRecordCubit>().displayErrorMessage(
-                sourceLanguage: sourceLanguage,
+                sourceLanguage:
+                    currentUser == User.host ? sourceLanguage : targetLanguage,
                 userSpeaking: currentUser,
               );
         } else {
@@ -198,6 +199,7 @@ class VoiceRecorder extends StatelessWidget {
                 );
               }
               return Container(
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
                   color: Colors.greenAccent,
                   borderRadius: BorderRadius.circular(50),
@@ -208,7 +210,7 @@ class VoiceRecorder extends StatelessWidget {
                   ),
                 ),
                 child: const Icon(
-                  size: 55,
+                  size: 45,
                   color: Colors.white,
                   Icons.keyboard_voice_outlined,
                 ),
