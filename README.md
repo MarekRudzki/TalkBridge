@@ -29,6 +29,13 @@ The application allows instant translation of text or speech into dozens of lang
 - Google Speech API
 - Record & path_provider
 
+<p float="left">
+<img src="https://user-images.githubusercontent.com/102899533/272051190-ed3c7784-1da1-4c56-a949-9253b4205a47.jpg" width=25% height=25%>
+<img src="https://user-images.githubusercontent.com/102899533/272051187-f768447b-ca5a-4549-bd84-97f7b004ab81.jpg" width=25% height=25%>
+<img src="https://user-images.githubusercontent.com/102899533/272051178-c9bd87e0-6a72-4e7b-b9dd-f62daca239c3.jpg" width=25% height=25%>
+<img src="https://user-images.githubusercontent.com/102899533/272051189-2a4071a1-5715-4bd2-a3d2-2c1854f64810.jpg" width=25% height=25%>
+<img src="https://user-images.githubusercontent.com/102899533/272051171-733b643d-8bdc-4bdb-a61c-1879b29a6776.jpg" width=25% height=25%>
+</p>
 
 ## Technologies
 Project was created with:
