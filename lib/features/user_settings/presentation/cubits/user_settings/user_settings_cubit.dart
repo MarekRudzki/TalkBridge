@@ -1,5 +1,8 @@
+// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/user_settings/data/models/user_settings_model.dart';
 import 'package:talkbridge/features/user_settings/domain/repositories/user_settings_repository.dart';

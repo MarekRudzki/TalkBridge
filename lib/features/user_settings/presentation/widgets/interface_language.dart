@@ -1,6 +1,11 @@
-import 'package:country_flags/country_flags.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 import 'package:talkbridge/utils/l10n/localization.dart';

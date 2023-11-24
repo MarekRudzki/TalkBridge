@@ -1,7 +1,13 @@
+// Dart imports:
 import 'dart:async';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/no_network.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/split_screen.dart';

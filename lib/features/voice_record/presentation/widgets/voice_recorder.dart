@@ -1,19 +1,24 @@
+// Dart imports:
 import 'dart:io';
 
-import 'package:avatar_glow/avatar_glow.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:record/record.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+// Package imports:
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_speech/google_speech.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:translator_plus/translator_plus.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
 import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
-
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
-import 'package:translator_plus/translator_plus.dart';
 
 class VoiceRecorder extends StatelessWidget {
   final User currentUser;
