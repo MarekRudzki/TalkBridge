@@ -1,8 +1,13 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/home_screen.dart';
 import 'package:talkbridge/features/language_picker/data/datasources/language_picker_local_data_source.dart';
@@ -11,7 +16,6 @@ import 'package:talkbridge/features/language_picker/presentation/cubit/language_
 import 'package:talkbridge/features/user_settings/data/datasources/user_settings_local_data_source.dart';
 import 'package:talkbridge/features/user_settings/domain/repositories/user_settings_repository.dart';
 import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
-
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 import 'package:talkbridge/utils/l10n/translations/translation.dart';
 

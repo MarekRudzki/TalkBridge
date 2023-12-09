@@ -1,5 +1,8 @@
+// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Project imports:
 import 'package:talkbridge/features/language_picker/domain/models/language_model.dart';
 import 'package:talkbridge/features/language_picker/domain/repositories/language_picker_repository.dart';
 

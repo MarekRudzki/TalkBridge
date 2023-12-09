@@ -1,8 +1,11 @@
+// Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:translator_plus/translator_plus.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/constants/extensions.dart';
-import 'package:translator_plus/translator_plus.dart';
 
 part 'voice_record_state.dart';
 

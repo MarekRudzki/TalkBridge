@@ -1,3 +1,4 @@
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
 
 class UserSettingsModel {

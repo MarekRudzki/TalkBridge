@@ -1,17 +1,23 @@
-import 'package:country_flags/country_flags.dart';
+// Dart imports:
+import 'dart:math' as math;
+
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+// Project imports:
 import 'package:talkbridge/constants/enums.dart';
-import 'package:talkbridge/features/home_screen/presentation/widgets/languages_reverse.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/captured_text.dart';
+import 'package:talkbridge/features/home_screen/presentation/widgets/languages_reverse.dart';
 import 'package:talkbridge/features/home_screen/presentation/widgets/text_to_speech.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
-
 import 'package:talkbridge/features/language_picker/presentation/language_pick_screen.dart';
 import 'package:talkbridge/features/user_settings/presentation/user_settings_screen.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/widgets/voice_recorder.dart';
-import 'dart:math' as math;
 
 class SplitScreen extends StatelessWidget {
   final User userScreen;
