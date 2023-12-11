@@ -9,9 +9,7 @@ import 'package:talkbridge/features/language_picker/presentation/cubit/language_
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
 
 class LanguagesReverse extends StatelessWidget {
-  const LanguagesReverse({
-    super.key,
-  });
+  const LanguagesReverse({super.key});
 
   @override
   Widget build(BuildContext context) {
