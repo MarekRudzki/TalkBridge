@@ -44,16 +44,13 @@ class TextTranslationsPl extends TextTranslations {
   String get lngDanish => 'Duński';
 
   @override
-  String get lngDutchBelgium => 'Niderlandzki (Belgijski)';
-
-  @override
   String get lngDutchNetherlands => 'Niderlandzki (Holenderski)';
 
   @override
   String get lngEnglishAustralia => 'Angielski (Australijski)';
 
   @override
-  String get lngEnglishCanada => 'Angielski (Canadyjski)';
+  String get lngEnglishCanada => 'Angielski (Kanadyjski)';
 
   @override
   String get lngEnglishIndia => 'Angielski (Indyjski)';

@@ -1,21 +1,16 @@
 // Dart imports:
 import 'dart:async';
-import 'dart:io';
 
 // Flutter imports:
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart' as p;
 
 // Package imports:
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:google_speech/google_speech.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
 import 'package:translator_plus/translator_plus.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 
 // Project imports:
 import 'package:talkbridge/constants/enums.dart';
@@ -25,6 +20,7 @@ import 'package:talkbridge/features/voice_record/presentation/cubits/voice_recor
 
 class VoiceRecorder extends StatefulWidget {
   final User currentUser;
+
   const VoiceRecorder({
     super.key,
     required this.currentUser,
@@ -35,206 +31,107 @@ class VoiceRecorder extends StatefulWidget {
 }
 
 class _VoiceRecorderState extends State<VoiceRecorder> {
-  int _recordDuration = 0;
-  Timer? _timer;
-  late final AudioRecorder _audioRecorder;
-  StreamSubscription<RecordState>? _recordSub;
-  RecordState _recordState = RecordState.stop;
-  Amplitude? _amplitude;
-  StreamSubscription<Amplitude>? _amplitudeSub;
+  final SpeechToText _speechToText = SpeechToText();
+  String _lastWords = '';
 
   @override
   void initState() {
-    _audioRecorder = AudioRecorder();
-
-    _recordSub = _audioRecorder.onStateChanged().listen((recordState) {
-      _updateRecordState(recordState);
-    });
-
-    _amplitudeSub = _audioRecorder
-        .onAmplitudeChanged(const Duration(milliseconds: 300))
-        .listen((amp) {
-      setState(() => _amplitude = amp);
-    });
-
     super.initState();
+    _initSpeech();
   }
 
-  Future<Stream<List<int>>> getAudioStream(String name) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = '${directory.path}/$name';
-    return File(path).openRead();
+  Future<void> _initSpeech() async {
+    await _speechToText.initialize();
+    setState(() {});
   }
 
-  Future<void> _pause() => _audioRecorder.pause();
-
-  Future<void> _resume() => _audioRecorder.resume();
-
-  void _updateRecordState(RecordState recordState) {
-    setState(() => _recordState = recordState);
-
-    switch (recordState) {
-      case RecordState.pause:
-        _timer?.cancel();
-        break;
-      case RecordState.record:
-        _startTimer();
-        break;
-      case RecordState.stop:
-        _timer?.cancel();
-        _recordDuration = 0;
-        break;
+  Future<void> startRecording({
+    required String sourceLanguage,
+    required String targetLanguage,
+  }) async {
+    _lastWords = '';
+    final hasPermission = await _speechToText.hasPermission;
+    if (hasPermission) {
+      if (!context.mounted) return;
+      context.read<VoiceRecordCubit>().setRecordingStatus(
+            recordingUser: widget.currentUser == User.host
+                ? RecordingUser.host
+                : RecordingUser.guest,
+          );
     }
+
+    await _speechToText.listen(
+        onResult: _onSpeechResult,
+        localeId:
+            widget.currentUser == User.host ? sourceLanguage : targetLanguage);
+    setState(() {});
   }
 
-  void _startTimer() {
-    _timer?.cancel();
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      setState(() => _recordDuration++);
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _lastWords = result.recognizedWords;
     });
+  }
+
+  Future<void> stopRecording({
+    required String sourceLanguage,
+    required String targetLanguage,
+    required bool isAutoPlay,
+  }) async {
+    await _speechToText.stop();
+    setState(() {});
+
+    if (!context.mounted) return;
+    context.read<VoiceRecordCubit>().setRecordingStatus(
+          recordingUser: RecordingUser.none,
+        );
+    context.read<VoiceRecordCubit>().startLoading();
+
+    // Wait for _lastWords to update
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (!context.mounted) return;
+    if (_lastWords.isEmpty) {
+      context.read<VoiceRecordCubit>().displayErrorMessage(
+            sourceLanguage: widget.currentUser == User.host
+                ? sourceLanguage
+                : targetLanguage,
+            userSpeaking: widget.currentUser,
+          );
+    } else {
+      await context.read<VoiceRecordCubit>().updateSpeechText(
+            text: _lastWords,
+            sourceLanguage: widget.currentUser == User.host
+                ? sourceLanguage
+                : targetLanguage,
+            targetLanguage: widget.currentUser == User.host
+                ? targetLanguage
+                : sourceLanguage,
+            userSpeaking: widget.currentUser,
+          );
+      if (isAutoPlay) {
+        final FlutterTts ftts = FlutterTts();
+        final translator = GoogleTranslator();
+        await ftts.setPitch(1);
+        await ftts.setVolume(1.0);
+        await ftts.setSpeechRate(0.5);
+        await ftts.setLanguage(
+            widget.currentUser == User.host ? targetLanguage : sourceLanguage);
+
+        final translation = await translator.translate(
+          _lastWords,
+          from:
+              widget.currentUser == User.host ? sourceLanguage : targetLanguage,
+          to: widget.currentUser == User.host ? targetLanguage : sourceLanguage,
+        );
+
+        await ftts.speak(translation.text);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Future<void> startRecording() async {
-      final hasPermission = await _audioRecorder.hasPermission();
-      if (hasPermission) {
-        if (!context.mounted) return;
-        const encoder = AudioEncoder.wav;
-        context.read<VoiceRecordCubit>().setRecordingStatus(
-              recordingUser: widget.currentUser == User.host
-                  ? RecordingUser.host
-                  : RecordingUser.guest,
-            );
-
-        // We don't do anything with this but printing
-
-        final isSupported = await _audioRecorder.isEncoderSupported(encoder);
-        debugPrint('${encoder.name} supported: $isSupported');
-
-        final devs = await _audioRecorder.listInputDevices();
-        debugPrint(devs.toString());
-
-        const config = RecordConfig(encoder: encoder, bitRate: 12800);
-        final directory = await getApplicationDocumentsDirectory();
-        // Record to file
-        String path;
-        if (kIsWeb) {
-          path = '';
-        } else {
-          path = p.join('${directory.path}/speech.wav');
-        }
-        await _audioRecorder.start(config, path: path);
-
-        // Record to stream
-        // final file = File(path);
-        // final stream = await _audioRecorder.startStream(config);
-        // stream.listen(
-        //   (data) {
-        //     // ignore: avoid_print
-        //     print(
-        //       _audioRecorder.convertBytesToInt16(Uint8List.fromList(data)),
-        //     );
-        //     file.writeAsBytesSync(data, mode: FileMode.append);
-        //   },
-        //   // ignore: avoid_print
-        //   onDone: () => print('End of stream'),
-        // );
-
-        _recordDuration = 0;
-
-        _startTimer();
-      }
-    }
-
-    Future<void> stopRecording({
-      required String sourceLanguage,
-      required String targetLanguage,
-      required bool isAutoPlay,
-    }) async {
-      String transcription = '';
-
-      if (!context.mounted) return;
-      context.read<VoiceRecordCubit>().setRecordingStatus(
-            recordingUser: RecordingUser.none,
-          );
-      context.read<VoiceRecordCubit>().startLoading();
-      await _audioRecorder.stop();
-
-      // * here it will fail if you did not add your own json for google api
-      final serviceAccount = ServiceAccount.fromString(
-        await rootBundle.loadString(
-          'assets/talkbridge_service_account.json',
-        ),
-      );
-
-      final speechToText = SpeechToText.viaServiceAccount(serviceAccount);
-      final streamingConfig = StreamingRecognitionConfig(
-        config: RecognitionConfig(
-          encoding: AudioEncoding.LINEAR16,
-          enableAutomaticPunctuation: true,
-          sampleRateHertz: 44100,
-          audioChannelCount: 2,
-          languageCode:
-              widget.currentUser == User.host ? sourceLanguage : targetLanguage,
-        ),
-        interimResults: true,
-      );
-
-      final audio = await getAudioStream('speech.wav');
-
-      final responseStream =
-          speechToText.streamingRecognize(streamingConfig, audio);
-
-      responseStream.listen((data) async {
-        transcription =
-            data.results.map((e) => e.alternatives.first.transcript).join('\n');
-      }).onDone(() async {
-        if (transcription.isEmpty) {
-          context.read<VoiceRecordCubit>().displayErrorMessage(
-                sourceLanguage: widget.currentUser == User.host
-                    ? sourceLanguage
-                    : targetLanguage,
-                userSpeaking: widget.currentUser,
-              );
-        } else {
-          await context.read<VoiceRecordCubit>().updateSpeechText(
-                text: transcription,
-                sourceLanguage: widget.currentUser == User.host
-                    ? sourceLanguage
-                    : targetLanguage,
-                targetLanguage: widget.currentUser == User.host
-                    ? targetLanguage
-                    : sourceLanguage,
-                userSpeaking: widget.currentUser,
-              );
-          if (isAutoPlay) {
-            final FlutterTts ftts = FlutterTts();
-            final translator = GoogleTranslator();
-            await ftts.setPitch(1);
-            await ftts.setVolume(1.0);
-            await ftts.setSpeechRate(0.5);
-            await ftts.setLanguage(widget.currentUser == User.host
-                ? targetLanguage
-                : sourceLanguage);
-
-            final translation = await translator.translate(
-              transcription,
-              from: widget.currentUser == User.host
-                  ? sourceLanguage
-                  : targetLanguage,
-              to: widget.currentUser == User.host
-                  ? targetLanguage
-                  : sourceLanguage,
-            );
-
-            await ftts.speak(translation.text);
-          }
-        }
-      });
-    }
-
     return BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
       builder: (context, languagePickerState) {
         if (languagePickerState is LanguagesSelected) {
@@ -266,7 +163,12 @@ class _VoiceRecorderState extends State<VoiceRecorder> {
                               isAutoPlay: userSettingsState.isAutoPlay,
                             );
                           } else {
-                            await startRecording();
+                            await startRecording(
+                              sourceLanguage: languagePickerState.sourceLanguage
+                                  .substring(0, 2),
+                              targetLanguage: languagePickerState.targetLanguage
+                                  .substring(0, 2),
+                            );
                           }
                         },
                         child: Container(

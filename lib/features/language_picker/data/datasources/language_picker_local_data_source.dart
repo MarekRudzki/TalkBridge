@@ -14,7 +14,7 @@ class LanguagePickerLocalDataSource {
 
   Future<String> getSourceLanguage() async {
     if (!_languageBox.containsKey('source_language')) {
-      await setSourceLanguage(language: 'pl-PL');
+      await setSourceLanguage(language: 'pl_PL');
     }
     final String sourceLanguage = _languageBox.get('source_language') as String;
     return sourceLanguage;
@@ -22,7 +22,7 @@ class LanguagePickerLocalDataSource {
 
   Future<String> getTargetLanguage() async {
     if (!_languageBox.containsKey('target_language')) {
-      await setTargetLanguage(language: 'en-GB');
+      await setTargetLanguage(language: 'en_GB');
     }
     final String targetLanguage = _languageBox.get('target_language') as String;
     return targetLanguage;

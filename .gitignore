@@ -32,8 +32,6 @@ migrate_working_dir/
 .pub/
 /build/
 
-#json service account
-*.json
 
 # Symbolication related
 app.*.symbols

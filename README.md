@@ -12,7 +12,7 @@ The application allows instant translation of text or speech into dozens of lang
 
 ### :star: What's included
 - Split screen
-- 28 available languages
+- 27 available languages
 - Speech-to-text and text-to-speech support
 - l10n app interface support (currently PL and EN)
 - Customizable font size, auto play
@@ -50,9 +50,7 @@ Project was created with:
 2. Open command prompt and navigate to the path where you want to clone repo.
 3. Paste copied link and hit enter.
 4. Congrats, you have successfully cloned this repository in your computer!
-5. Open project in IDE of your choice.
-6. Create a [Google Cloud](https://console.cloud.google.com/) account and activate the Speech Api. Get the Json file, rename it as "talkbridge_service_account.json" and save to assets folder.
-7. Run the app.
+5. Open project in IDE of your choice and run the app.
 
 ---
 

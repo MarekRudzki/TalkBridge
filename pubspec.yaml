@@ -24,6 +24,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
   path_provider: ^2.1.1
   record: ^5.0.1
+  speech_to_text: ^6.5.0
   translator_plus: ^1.0.1
 
 dev_dependencies:

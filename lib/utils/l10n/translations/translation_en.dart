@@ -44,9 +44,6 @@ class TextTranslationsEn extends TextTranslations {
   String get lngDanish => 'Danish';
 
   @override
-  String get lngDutchBelgium => 'Dutch (Belgium)';
-
-  @override
   String get lngDutchNetherlands => 'Dutch (Netherlands)';
 
   @override

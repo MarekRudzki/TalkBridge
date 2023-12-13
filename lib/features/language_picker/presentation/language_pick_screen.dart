@@ -21,37 +21,6 @@ class LanguagePickScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, String> langauges = {
-      context.l10n.lngArabic: 'ar-EG',
-      context.l10n.lngBulgarian: 'bg-BG',
-      context.l10n.lngCroatian: 'hr-HR',
-      context.l10n.lngCzech: 'cs-CZ',
-      context.l10n.lngDanish: 'da-DK',
-      context.l10n.lngDutchBelgium: 'nl-BE',
-      context.l10n.lngDutchNetherlands: 'nl-NL',
-      context.l10n.lngEnglishAustralia: 'en-AU',
-      context.l10n.lngEnglishCanada: 'en-CA',
-      context.l10n.lngEnglishIndia: 'en-IN',
-      context.l10n.lngEnglishUK: 'en-GB',
-      context.l10n.lngEnglishUS: 'en-US',
-      context.l10n.lngEstonian: 'et-EE',
-      context.l10n.lngFrench: 'fr-FR',
-      context.l10n.lngGerman: 'de-DE',
-      context.l10n.lngGreek: 'el-GR',
-      context.l10n.lngItalian: 'it-IT',
-      context.l10n.lngLatvian: 'lv-LV',
-      context.l10n.lngLithuanian: 'lt-LT',
-      context.l10n.lngPolish: 'pl-PL',
-      context.l10n.lngPortuguese: 'pt-PT',
-      context.l10n.lngRomanian: 'ro-RO',
-      context.l10n.lngRussian: 'ru-RU',
-      context.l10n.lngSlovak: 'sk-SK',
-      context.l10n.lngSlovenian: 'sl-SI',
-      context.l10n.lngSpanish: 'es-ES',
-      context.l10n.lngTurkish: 'tr-TR',
-      context.l10n.lngUkrainian: 'uk-UA'
-    };
-
     List<String> availableLanguagesKeys = [];
     List<String> availableLanguagesValues = [];
 
@@ -59,6 +28,12 @@ class LanguagePickScreen extends StatelessWidget {
       child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
         builder: (context, userSettingsState) {
           if (userSettingsState is UserSettingsInitial) {
+            final Map<String, String> languages = context
+                .read<LanguagePickerCubit>()
+                .getLanguageList(
+                  context: context,
+                  currentInterfaceLanguage: userSettingsState.interfaceLanguage,
+                );
             return Scaffold(
               backgroundColor: const Color.fromARGB(255, 213, 210, 210),
               appBar: AppBar(
@@ -92,31 +67,31 @@ class LanguagePickScreen extends StatelessWidget {
 
                         return Expanded(
                           child: ListView.builder(
-                            itemCount: langauges.length - 1,
+                            itemCount: languages.length - 1,
                             itemBuilder: (context, index) {
                               // If user chose given language as source language it should not be available as target
                               // The same applies in reverse
                               if (isSelectingSourceLng) {
-                                final ommitedMapEntry = langauges.entries
+                                final ommitedMapEntry = languages.entries
                                     .firstWhere((entry) =>
                                         entry.value == targetLanguage);
 
-                                availableLanguagesKeys = langauges.keys
+                                availableLanguagesKeys = languages.keys
                                     .where((key) => key != ommitedMapEntry.key)
                                     .toList();
-                                availableLanguagesValues = langauges.values
+                                availableLanguagesValues = languages.values
                                     .where((value) =>
                                         value != ommitedMapEntry.value)
                                     .toList();
                               } else {
-                                final ommitedMapEntry = langauges.entries
+                                final ommitedMapEntry = languages.entries
                                     .firstWhere((entry) =>
                                         entry.value == sourceLanguage);
 
-                                availableLanguagesKeys = langauges.keys
+                                availableLanguagesKeys = languages.keys
                                     .where((key) => key != ommitedMapEntry.key)
                                     .toList();
-                                availableLanguagesValues = langauges.values
+                                availableLanguagesValues = languages.values
                                     .where((value) =>
                                         value != ommitedMapEntry.value)
                                     .toList();

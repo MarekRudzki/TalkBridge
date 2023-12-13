@@ -171,12 +171,6 @@ abstract class TextTranslations {
   /// **'Danish'**
   String get lngDanish;
 
-  /// No description provided for @lngDutchBelgium.
-  ///
-  /// In en, this message translates to:
-  /// **'Dutch (Belgium)'**
-  String get lngDutchBelgium;
-
   /// No description provided for @lngDutchNetherlands.
   ///
   /// In en, this message translates to:
