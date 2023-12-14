@@ -13,12 +13,11 @@ import 'package:talkbridge/features/voice_record/presentation/cubits/voice_recor
 class TextToSpeech extends StatelessWidget {
   final User userScreen;
   final double speechSpeed;
-  final Widget iconWidget;
+
   const TextToSpeech({
     super.key,
     required this.userScreen,
     required this.speechSpeed,
-    required this.iconWidget,
   });
 
   @override
@@ -26,26 +25,38 @@ class TextToSpeech extends StatelessWidget {
     return BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
       builder: (context, languagePickerState) {
         if (languagePickerState is LanguagesSelected) {
+          final String sourceLng =
+              languagePickerState.sourceLanguage.substring(0, 2);
+          final String targetLng =
+              languagePickerState.targetLanguage.substring(0, 2);
+
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
             builder: (context, voiceRecordState) {
-              if (voiceRecordState is VoiceRecordInitial) {
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: iconWidget,
-                    ),
-                    onTap: () async {
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: speechSpeed == 0.5
+                        ? const Icon(
+                            Icons.record_voice_over_outlined,
+                            color: Colors.white,
+                            size: 25,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: Image.asset('assets/turtle.png', scale: 5),
+                          ),
+                  ),
+                  onTap: () async {
+                    if (voiceRecordState is VoiceRecordInitial) {
                       final FlutterTts ftts = FlutterTts();
                       await ftts.setPitch(1);
                       await ftts.setVolume(1.0);
                       await ftts.setSpeechRate(speechSpeed);
                       await ftts.setLanguage(
-                        userScreen == User.host
-                            ? languagePickerState.sourceLanguage
-                            : languagePickerState.targetLanguage,
+                        userScreen == User.host ? sourceLng : targetLng,
                       );
 
                       await ftts.speak(
@@ -53,11 +64,10 @@ class TextToSpeech extends StatelessWidget {
                             ? voiceRecordState.speechText
                             : voiceRecordState.translation,
                       );
-                    },
-                  ),
-                );
-              }
-              return iconWidget;
+                    }
+                  },
+                ),
+              );
             },
           );
         }

@@ -75,7 +75,7 @@ class CapturedText extends StatelessWidget {
       required BuildContext currentContext,
       required String text,
       required String sourceLanguage,
-      required String targetLangauge,
+      required String targetLanguage,
     }) async {
       if (text == '') {
         currentContext.read<VoiceRecordCubit>().setInitialState();
@@ -83,22 +83,21 @@ class CapturedText extends StatelessWidget {
         await currentContext.read<VoiceRecordCubit>().updateSpeechText(
               text: text,
               sourceLanguage: sourceLanguage.substring(0, 2),
-              targetLanguage: targetLangauge.substring(0, 2),
+              targetLanguage: targetLanguage.substring(0, 2),
               userSpeaking: userSpeaking,
             );
 
         final translation = await translator.translate(
           text,
           from: sourceLanguage.substring(0, 2),
-          to: targetLangauge.substring(0, 2),
+          to: targetLanguage.substring(0, 2),
         );
 
         final FlutterTts ftts = FlutterTts();
         await ftts.setPitch(1);
         await ftts.setVolume(1.0);
         await ftts.setSpeechRate(0.5);
-        await ftts.setLanguage(targetLangauge);
-
+        await ftts.setLanguage(targetLanguage);
         await ftts.speak(translation.text);
       }
     }
@@ -143,7 +142,7 @@ class CapturedText extends StatelessWidget {
                                 text: value,
                                 sourceLanguage:
                                     languagePickerState.sourceLanguage,
-                                targetLangauge:
+                                targetLanguage:
                                     languagePickerState.targetLanguage,
                               );
                             },
@@ -165,7 +164,7 @@ class CapturedText extends StatelessWidget {
                                     text: value,
                                     sourceLanguage:
                                         languagePickerState.sourceLanguage,
-                                    targetLangauge:
+                                    targetLanguage:
                                         languagePickerState.targetLanguage,
                                   );
                                 },

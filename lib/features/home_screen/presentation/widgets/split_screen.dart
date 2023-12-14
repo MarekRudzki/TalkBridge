@@ -110,7 +110,8 @@ class SplitScreen extends StatelessWidget {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         const LanguagePickScreen(
-                                            isSelectingSourceLng: true),
+                                      isSelectingSourceLng: true,
+                                    ),
                                   ),
                                 );
                               },
@@ -174,19 +175,10 @@ class SplitScreen extends StatelessWidget {
                       TextToSpeech(
                         userScreen: userScreen,
                         speechSpeed: 0.5,
-                        iconWidget: const Icon(
-                          Icons.record_voice_over_outlined,
-                          color: Colors.white,
-                          size: 25,
-                        ),
                       ),
                       TextToSpeech(
                         userScreen: userScreen,
                         speechSpeed: 0.25,
-                        iconWidget: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Image.asset('assets/turtle.png', scale: 5),
-                        ),
                       ),
                       if (userScreen == User.host)
                         IconButton(

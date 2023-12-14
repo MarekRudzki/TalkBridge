@@ -26,8 +26,6 @@ The application allows instant translation of text or speech into dozens of lang
 - Hive
 - L10n
 - Lints
-- Google Speech API
-- Record & path_provider
 
 <p float="left">
 <img src="https://user-images.githubusercontent.com/102899533/272051190-ed3c7784-1da1-4c56-a949-9253b4205a47.jpg" width=25% height=25%>

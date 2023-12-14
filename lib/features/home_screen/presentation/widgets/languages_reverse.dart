@@ -18,9 +18,9 @@ class LanguagesReverse extends StatelessWidget {
         if (languagePickerState is LanguagesSelected) {
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
             builder: (context, voiceRecordState) {
-              if (voiceRecordState is VoiceRecordInitial) {
-                return IconButton(
-                  onPressed: () async {
+              return IconButton(
+                onPressed: () async {
+                  if (voiceRecordState is VoiceRecordInitial) {
                     await context
                         .read<LanguagePickerCubit>()
                         .reverseLanguages();
@@ -32,18 +32,13 @@ class LanguagesReverse extends StatelessWidget {
                             translation: voiceRecordState.translation,
                           );
                     }
-                  },
-                  icon: const Icon(
-                    Icons.cached,
-                    color: Colors.white,
-                    size: 33,
-                  ),
-                );
-              }
-              return const Icon(
-                Icons.cached,
-                color: Colors.white,
-                size: 33,
+                  }
+                },
+                icon: const Icon(
+                  Icons.cached,
+                  color: Colors.white,
+                  size: 33,
+                ),
               );
             },
           );

@@ -136,25 +136,32 @@ class _VoiceRecorderState extends State<VoiceRecorder> {
       builder: (context, languagePickerState) {
         if (languagePickerState is LanguagesSelected) {
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
-            builder: (context, state) {
-              if (state is VoiceRecordInitial) {
-                bool shouldAnimate() {
-                  if ((widget.currentUser == User.host &&
-                          state.recordingUser == RecordingUser.host) ||
-                      (widget.currentUser == User.guest &&
-                          state.recordingUser == RecordingUser.guest)) {
-                    return true;
-                  } else {
-                    return false;
-                  }
-                }
-
+            builder: (context, voiceRecordState) {
+              if (voiceRecordState is VoiceRecordInitial) {
                 return BlocBuilder<UserSettingsCubit, UserSettingsState>(
                   builder: (context, userSettingsState) {
+                    bool shouldAnimate() {
+                      if (userSettingsState is! UserSettingsInitial) {
+                        return false;
+                      }
+
+                      if ((widget.currentUser == User.host &&
+                              voiceRecordState.recordingUser ==
+                                  RecordingUser.host) ||
+                          (widget.currentUser == User.guest &&
+                              voiceRecordState.recordingUser ==
+                                  RecordingUser.guest)) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }
+
                     if (userSettingsState is UserSettingsInitial) {
                       return InkWell(
                         onTap: () async {
-                          if (state.recordingUser != RecordingUser.none) {
+                          if (voiceRecordState.recordingUser !=
+                              RecordingUser.none) {
                             await stopRecording(
                               sourceLanguage: languagePickerState.sourceLanguage
                                   .substring(0, 2),
