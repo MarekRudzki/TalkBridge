@@ -1,6 +1,8 @@
 // Package imports:
 import 'package:hive/hive.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class UserSettingsLocalDataSource {
   final _userSettings = Hive.box('user_settings');
 

@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
 // Project imports:
 import 'package:talkbridge/constants/enums.dart';
@@ -9,8 +10,10 @@ import 'package:talkbridge/features/user_settings/domain/repositories/user_setti
 
 part 'user_settings_state.dart';
 
+@injectable
 class UserSettingsCubit extends Cubit<UserSettingsState> {
   final UserSettingsRepository userSettingsRepository;
+
   UserSettingsCubit({
     required this.userSettingsRepository,
   }) : super(

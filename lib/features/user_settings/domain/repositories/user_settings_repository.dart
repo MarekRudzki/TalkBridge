@@ -1,8 +1,10 @@
 // Project imports:
+import 'package:injectable/injectable.dart';
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/user_settings/data/datasources/user_settings_local_data_source.dart';
 import 'package:talkbridge/features/user_settings/data/models/user_settings_model.dart';
 
+@lazySingleton
 class UserSettingsRepository {
   final UserSettingsLocalDataSource _dataSource;
 

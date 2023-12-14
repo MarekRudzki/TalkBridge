@@ -1,6 +1,8 @@
 // Package imports:
 import 'package:hive/hive.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class LanguagePickerLocalDataSource {
   final _languageBox = Hive.box('language_box');
 

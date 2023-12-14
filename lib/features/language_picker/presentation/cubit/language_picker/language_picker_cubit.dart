@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:talkbridge/constants/enums.dart';
 
 // Project imports:
@@ -11,6 +12,7 @@ import 'package:talkbridge/utils/l10n/localization.dart';
 
 part 'language_picker_state.dart';
 
+@injectable
 class LanguagePickerCubit extends Cubit<LanguagePickerState> {
   final LanguagePickerRepository repository;
   LanguagePickerCubit(this.repository) : super(LanguagePickerInitial());

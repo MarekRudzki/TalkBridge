@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:translator_plus/translator_plus.dart';
 
 // Project imports:
@@ -9,6 +10,7 @@ import 'package:talkbridge/constants/extensions.dart';
 
 part 'voice_record_state.dart';
 
+@injectable
 class VoiceRecordCubit extends Cubit<VoiceRecordState> {
   VoiceRecordCubit()
       : super(const VoiceRecordInitial(recordingUser: RecordingUser.none));

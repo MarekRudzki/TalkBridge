@@ -1,7 +1,9 @@
 // Project imports:
+import 'package:injectable/injectable.dart';
 import 'package:talkbridge/features/language_picker/data/datasources/language_picker_local_data_source.dart';
 import 'package:talkbridge/features/language_picker/domain/models/language_model.dart';
 
+@lazySingleton
 class LanguagePickerRepository {
   final LanguagePickerLocalDataSource languagePickerLocalDataSource;
 

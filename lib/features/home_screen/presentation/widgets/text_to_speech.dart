@@ -25,11 +25,6 @@ class TextToSpeech extends StatelessWidget {
     return BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
       builder: (context, languagePickerState) {
         if (languagePickerState is LanguagesSelected) {
-          final String sourceLng =
-              languagePickerState.sourceLanguage.substring(0, 2);
-          final String targetLng =
-              languagePickerState.targetLanguage.substring(0, 2);
-
           return BlocBuilder<VoiceRecordCubit, VoiceRecordState>(
             builder: (context, voiceRecordState) {
               return Material(
@@ -56,13 +51,26 @@ class TextToSpeech extends StatelessWidget {
                       await ftts.setVolume(1.0);
                       await ftts.setSpeechRate(speechSpeed);
                       await ftts.setLanguage(
-                        userScreen == User.host ? sourceLng : targetLng,
+                        userScreen == User.host
+                            ? languagePickerState.sourceLanguage.substring(0, 2)
+                            : languagePickerState.targetLanguage
+                                .substring(0, 2),
                       );
 
+                      String textToSpeak() {
+                        final User userSpeaking = voiceRecordState.userSpeaking;
+                        if ((userScreen == User.host &&
+                                userSpeaking == User.host) ||
+                            (userScreen == User.guest &&
+                                userSpeaking == User.guest)) {
+                          return voiceRecordState.speechText;
+                        } else {
+                          return voiceRecordState.translation;
+                        }
+                      }
+
                       await ftts.speak(
-                        userScreen == User.host
-                            ? voiceRecordState.speechText
-                            : voiceRecordState.translation,
+                        textToSpeak(),
                       );
                     }
                   },
