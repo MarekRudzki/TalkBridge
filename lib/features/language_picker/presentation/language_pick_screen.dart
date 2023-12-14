@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
 import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:talkbridge/utils/di.dart';
 import 'package:talkbridge/utils/l10n/localization.dart';
 
 class LanguagePickScreen extends StatelessWidget {
@@ -21,9 +22,6 @@ class LanguagePickScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> availableLanguagesKeys = [];
-    List<String> availableLanguagesValues = [];
-
     return SafeArea(
       child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
         builder: (context, userSettingsState) {
@@ -60,42 +58,25 @@ class LanguagePickScreen extends StatelessWidget {
               body: Column(
                 children: [
                   BlocBuilder<LanguagePickerCubit, LanguagePickerState>(
-                    builder: (context, state) {
-                      if (state is LanguagesSelected) {
-                        final String targetLanguage = state.targetLanguage;
-                        final String sourceLanguage = state.sourceLanguage;
+                    builder: (context, languagePickerState) {
+                      if (languagePickerState is LanguagesSelected) {
+                        final String targetLanguage =
+                            languagePickerState.targetLanguage;
+                        final String sourceLanguage =
+                            languagePickerState.sourceLanguage;
 
                         return Expanded(
                           child: ListView.builder(
                             itemCount: languages.length - 1,
                             itemBuilder: (context, index) {
-                              // If user chose given language as source language it should not be available as target
-                              // The same applies in reverse
-                              if (isSelectingSourceLng) {
-                                final ommitedMapEntry = languages.entries
-                                    .firstWhere((entry) =>
-                                        entry.value == targetLanguage);
-
-                                availableLanguagesKeys = languages.keys
-                                    .where((key) => key != ommitedMapEntry.key)
-                                    .toList();
-                                availableLanguagesValues = languages.values
-                                    .where((value) =>
-                                        value != ommitedMapEntry.value)
-                                    .toList();
-                              } else {
-                                final ommitedMapEntry = languages.entries
-                                    .firstWhere((entry) =>
-                                        entry.value == sourceLanguage);
-
-                                availableLanguagesKeys = languages.keys
-                                    .where((key) => key != ommitedMapEntry.key)
-                                    .toList();
-                                availableLanguagesValues = languages.values
-                                    .where((value) =>
-                                        value != ommitedMapEntry.value)
-                                    .toList();
-                              }
+                              final Map<String, String> availableLanguages =
+                                  getIt<LanguagePickerCubit>()
+                                      .getAvailableLanguages(
+                                isSelectingSourceLng: isSelectingSourceLng,
+                                languages: languages,
+                                targetLanguage: targetLanguage,
+                                sourceLanguage: sourceLanguage,
+                              );
 
                               return Column(
                                 children: [
@@ -111,7 +92,8 @@ class LanguagePickScreen extends StatelessWidget {
                                                   .read<LanguagePickerCubit>()
                                                   .setSourceLanguage(
                                                       language:
-                                                          availableLanguagesValues
+                                                          availableLanguages
+                                                              .keys
                                                               .map((e) => e)
                                                               .toList()[index]);
                                               if (!context.mounted) return;
@@ -123,7 +105,8 @@ class LanguagePickScreen extends StatelessWidget {
                                                   .read<LanguagePickerCubit>()
                                                   .setTargetLanguage(
                                                       language:
-                                                          availableLanguagesValues
+                                                          availableLanguages
+                                                              .keys
                                                               .map((e) => e)
                                                               .toList()[index]);
                                               if (!context.mounted) return;
@@ -141,7 +124,8 @@ class LanguagePickScreen extends StatelessWidget {
                                                           sourceLanguage
                                                               .substring(0, 2),
                                                       targetLanguage:
-                                                          availableLanguagesValues
+                                                          availableLanguages
+                                                              .values
                                                               .map((e) => e)
                                                               .toList()[index]
                                                               .substring(0, 2),
@@ -168,7 +152,7 @@ class LanguagePickScreen extends StatelessWidget {
                                                 ),
                                                 child:
                                                     CountryFlag.fromCountryCode(
-                                                  availableLanguagesValues
+                                                  availableLanguages.keys
                                                       .map((e) =>
                                                           e.substring(3, 5))
                                                       .toList()[index],
@@ -188,7 +172,7 @@ class LanguagePickScreen extends StatelessWidget {
                                                         1,
                                                     fontWeight: FontWeight.w500,
                                                   ),
-                                                  availableLanguagesKeys
+                                                  availableLanguages.values
                                                       .map((e) => e)
                                                       .toList()[index],
                                                 ),

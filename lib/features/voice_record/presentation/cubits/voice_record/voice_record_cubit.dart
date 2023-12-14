@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 import 'package:translator_plus/translator_plus.dart';
 
 // Project imports:
@@ -86,5 +87,35 @@ class VoiceRecordCubit extends Cubit<VoiceRecordState> {
         translation: speechText,
       ),
     );
+  }
+
+  bool isMicrophoneAvailable({
+    required User currentUser,
+    required RecordingUser recordingUser,
+  }) {
+    if ((currentUser == User.host && recordingUser == RecordingUser.host) ||
+        (currentUser == User.guest && recordingUser == RecordingUser.guest) ||
+        recordingUser == RecordingUser.none) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool shouldAnimate({
+    required UserSettingsState userSettingsState,
+    required User currentUser,
+    required RecordingUser recordingUser,
+  }) {
+    if (userSettingsState is! UserSettingsInitial) {
+      return false;
+    }
+
+    if ((currentUser == User.host && recordingUser == RecordingUser.host) ||
+        (currentUser == User.guest && recordingUser == RecordingUser.guest)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

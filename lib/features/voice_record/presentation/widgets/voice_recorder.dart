@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:talkbridge/utils/di.dart';
 import 'package:translator_plus/translator_plus.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -82,14 +83,14 @@ class _VoiceRecorderState extends State<VoiceRecorder> {
     setState(() {});
 
     if (!context.mounted) return;
-    context.read<VoiceRecordCubit>().setRecordingStatus(
-          recordingUser: RecordingUser.none,
-        );
     context.read<VoiceRecordCubit>().startLoading();
 
     // Wait for _lastWords to update
     await Future.delayed(const Duration(seconds: 1));
-
+    if (!context.mounted) return;
+    context.read<VoiceRecordCubit>().setRecordingStatus(
+          recordingUser: RecordingUser.none,
+        );
     if (!context.mounted) return;
     if (_lastWords.isEmpty) {
       context.read<VoiceRecordCubit>().displayErrorMessage(
@@ -140,68 +141,81 @@ class _VoiceRecorderState extends State<VoiceRecorder> {
               if (voiceRecordState is VoiceRecordInitial) {
                 return BlocBuilder<UserSettingsCubit, UserSettingsState>(
                   builder: (context, userSettingsState) {
-                    bool shouldAnimate() {
-                      if (userSettingsState is! UserSettingsInitial) {
-                        return false;
-                      }
+                    final voiceRecordCubit = getIt<VoiceRecordCubit>();
 
-                      if ((widget.currentUser == User.host &&
-                              voiceRecordState.recordingUser ==
-                                  RecordingUser.host) ||
-                          (widget.currentUser == User.guest &&
-                              voiceRecordState.recordingUser ==
-                                  RecordingUser.guest)) {
-                        return true;
-                      } else {
-                        return false;
-                      }
-                    }
+                    final bool isMicrophoneAvailable =
+                        voiceRecordCubit.isMicrophoneAvailable(
+                      currentUser: widget.currentUser,
+                      recordingUser: voiceRecordState.recordingUser,
+                    );
+
+                    final bool shouldAnimate = voiceRecordCubit.shouldAnimate(
+                      userSettingsState: userSettingsState,
+                      currentUser: widget.currentUser,
+                      recordingUser: voiceRecordState.recordingUser,
+                    );
 
                     if (userSettingsState is UserSettingsInitial) {
                       return InkWell(
                         onTap: () async {
-                          if (voiceRecordState.recordingUser !=
-                              RecordingUser.none) {
-                            await stopRecording(
-                              sourceLanguage: languagePickerState.sourceLanguage
-                                  .substring(0, 2),
-                              targetLanguage: languagePickerState.targetLanguage
-                                  .substring(0, 2),
-                              isAutoPlay: userSettingsState.isAutoPlay,
-                            );
-                          } else {
-                            await startRecording(
-                              sourceLanguage: languagePickerState.sourceLanguage
-                                  .substring(0, 2),
-                              targetLanguage: languagePickerState.targetLanguage
-                                  .substring(0, 2),
-                            );
+                          if (isMicrophoneAvailable) {
+                            if (voiceRecordState.recordingUser !=
+                                RecordingUser.none) {
+                              await stopRecording(
+                                sourceLanguage: languagePickerState
+                                    .sourceLanguage
+                                    .substring(0, 2),
+                                targetLanguage: languagePickerState
+                                    .targetLanguage
+                                    .substring(0, 2),
+                                isAutoPlay: userSettingsState.isAutoPlay,
+                              );
+                            } else {
+                              await startRecording(
+                                sourceLanguage: languagePickerState
+                                    .sourceLanguage
+                                    .substring(0, 2),
+                                targetLanguage: languagePickerState
+                                    .targetLanguage
+                                    .substring(0, 2),
+                              );
+                            }
                           }
                         },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: shouldAnimate()
-                                ? Colors.white
-                                : Colors.greenAccent,
-                            borderRadius: BorderRadius.circular(50),
-                            border: Border.all(
-                              width: 8,
-                              color: Colors.white,
-                            ),
-                          ),
-                          child: AvatarGlow(
-                            endRadius: 30,
-                            animate: shouldAnimate(),
-                            glowColor: Colors.red,
-                            child: Icon(
-                              size: 45,
-                              color: shouldAnimate()
-                                  ? Colors.greenAccent
-                                  : Colors.white,
-                              Icons.keyboard_voice_outlined,
-                            ),
-                          ),
-                        ),
+                        child: isMicrophoneAvailable
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  color: shouldAnimate
+                                      ? Colors.white
+                                      : Colors.greenAccent,
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(
+                                    width: 8,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                child: AvatarGlow(
+                                  endRadius: 30,
+                                  animate: shouldAnimate,
+                                  glowColor: Colors.red,
+                                  child: Icon(
+                                    size: 45,
+                                    color: shouldAnimate
+                                        ? Colors.greenAccent
+                                        : Colors.white,
+                                    Icons.keyboard_voice_outlined,
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                height: 76,
+                                width: 76,
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
                       );
                     }
                     return const SizedBox.shrink();

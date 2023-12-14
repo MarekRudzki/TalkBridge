@@ -44,17 +44,8 @@ class FontSize extends StatelessWidget {
               divisions: 2,
               value: context.read<UserSettingsCubit>().getSliderValue(),
               onChanged: (value) {
-                final SelectedFontSize selectedFontSize;
-                if (value == 0) {
-                  selectedFontSize = SelectedFontSize.small;
-                } else if (value == 0.5) {
-                  selectedFontSize = SelectedFontSize.medium;
-                } else {
-                  selectedFontSize = SelectedFontSize.large;
-                }
-
                 context.read<UserSettingsCubit>().setFontSize(
-                      selectedFontSize: selectedFontSize,
+                      fontSize: value,
                     );
               },
             ),

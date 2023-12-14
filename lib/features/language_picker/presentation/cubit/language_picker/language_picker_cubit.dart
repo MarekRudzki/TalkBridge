@@ -124,4 +124,33 @@ class LanguagePickerCubit extends Cubit<LanguagePickerState> {
       };
     }
   }
+
+  Map<String, String> getAvailableLanguages({
+    required bool isSelectingSourceLng,
+    required Map<String, String> languages,
+    required String targetLanguage,
+    required String sourceLanguage,
+  }) {
+    // If user chose given language as source language it should not be available as target
+    // The same applies in reverse
+    Map<String, String> availableLanguages = {};
+
+    if (isSelectingSourceLng) {
+      final omittedMapEntry = languages.entries
+          .firstWhere((entry) => entry.value == targetLanguage);
+
+      availableLanguages = Map.fromEntries(languages.entries
+          .where((entry) => entry.key != omittedMapEntry.key)
+          .map((entry) => MapEntry(entry.value, entry.key)));
+    } else {
+      final omittedMapEntry = languages.entries
+          .firstWhere((entry) => entry.value == sourceLanguage);
+
+      availableLanguages = Map.fromEntries(languages.entries
+          .where((entry) => entry.key != omittedMapEntry.key)
+          .map((entry) => MapEntry(entry.value, entry.key)));
+    }
+
+    return availableLanguages;
+  }
 }

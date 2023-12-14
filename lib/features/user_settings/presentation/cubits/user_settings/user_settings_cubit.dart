@@ -32,11 +32,21 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
   }
 
   Future<void> setFontSize({
-    required SelectedFontSize selectedFontSize,
+    required double fontSize,
   }) async {
+    final SelectedFontSize selectedFontSize;
+    if (fontSize == 0) {
+      selectedFontSize = SelectedFontSize.small;
+    } else if (fontSize == 0.5) {
+      selectedFontSize = SelectedFontSize.medium;
+    } else {
+      selectedFontSize = SelectedFontSize.large;
+    }
+
     await userSettingsRepository.setFontSize(
       selectedFontSize: selectedFontSize,
     );
+
     emit((state as UserSettingsInitial).copyWith(
       fontSize: selectedFontSize,
     ));
@@ -48,6 +58,7 @@ class UserSettingsCubit extends Cubit<UserSettingsState> {
     await userSettingsRepository.setInterfaceLanguage(
       selectedInterfaceLanguage: selectedInterfaceLanguage,
     );
+
     emit((state as UserSettingsInitial).copyWith(
       interfaceLanguage: selectedInterfaceLanguage,
     ));
