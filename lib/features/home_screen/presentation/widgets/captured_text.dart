@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubit/home_screen_cubit_cubit.dart';
+import 'package:talkbridge/utils/di.dart';
 import 'package:translator_plus/translator_plus.dart';
 
 // Project imports:
@@ -32,43 +34,16 @@ class CapturedText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final translator = GoogleTranslator();
+    final HomeScreenCubit homeScreenCubit = getIt<HomeScreenCubit>();
     Timer? debounce;
 
     String displayInitialText() {
-      if (userScreenType == User.host) {
-        if (userSpeaking == User.host) {
-          return speechText == '' ? '' : speechText;
-        } else {
-          return translation == '' ? '' : translation;
-        }
-      } else {
-        if (userSpeaking == User.guest) {
-          return speechText == '' ? '' : speechText;
-        } else {
-          return translation == '' ? '' : translation;
-        }
-      }
-    }
-
-    Future<String> displayHintText({
-      required String sourceLanguage,
-      required String targetLanguage,
-    }) async {
-      if (userScreenType == User.host) {
-        final translation = await translator.translate(
-          'Start typing or use microphone',
-          from: 'en',
-          to: sourceLanguage,
-        );
-        return translation.text;
-      } else {
-        final translation = await translator.translate(
-          'Use microphone',
-          from: 'en',
-          to: targetLanguage,
-        );
-        return translation.text;
-      }
+      return homeScreenCubit.getInitialText(
+        userScreenType: userScreenType,
+        userSpeaking: userSpeaking,
+        translation: translation,
+        speechText: speechText,
+      );
     }
 
     Future<void> updateSpeechText({
@@ -77,7 +52,7 @@ class CapturedText extends StatelessWidget {
       required String sourceLanguage,
       required String targetLanguage,
     }) async {
-      if (text == '') {
+      if (text.isEmpty) {
         currentContext.read<VoiceRecordCubit>().setInitialState();
       } else {
         await currentContext.read<VoiceRecordCubit>().updateSpeechText(
@@ -97,7 +72,7 @@ class CapturedText extends StatelessWidget {
         await ftts.setPitch(1);
         await ftts.setVolume(1.0);
         await ftts.setSpeechRate(0.5);
-        await ftts.setLanguage(targetLanguage);
+        await ftts.setLanguage(targetLanguage.substring(0, 2));
         await ftts.speak(translation.text);
       }
     }
@@ -111,11 +86,14 @@ class CapturedText extends StatelessWidget {
                 builder: (context, userSettingsState) {
                   if (userSettingsState is UserSettingsInitial) {
                     return FutureBuilder(
-                      future: displayHintText(
-                          sourceLanguage: languagePickerState.sourceLanguage
-                              .substring(0, 2),
-                          targetLanguage: languagePickerState.targetLanguage
-                              .substring(0, 2)),
+                      future: homeScreenCubit.displayHintText(
+                        sourceLanguage:
+                            languagePickerState.sourceLanguage.substring(0, 2),
+                        targetLanguage:
+                            languagePickerState.targetLanguage.substring(0, 2),
+                        userScreenType: userScreenType,
+                        translator: translator,
+                      ),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           return TextField(

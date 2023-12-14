@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 // Project imports:
 import 'package:talkbridge/constants/enums.dart';
 import 'package:talkbridge/features/home_screen/home_screen.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubit/home_screen_cubit_cubit.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
 import 'package:talkbridge/features/user_settings/presentation/cubits/user_settings/user_settings_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
@@ -37,7 +38,10 @@ void main() async {
           ),
           BlocProvider(
             create: (context) => getIt<UserSettingsCubit>()..getUserSettings(),
-          )
+          ),
+          BlocProvider(
+            create: (context) => getIt<HomeScreenCubit>(),
+          ),
         ],
         child: BlocBuilder<UserSettingsCubit, UserSettingsState>(
           builder: (context, state) {

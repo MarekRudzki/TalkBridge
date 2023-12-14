@@ -7,8 +7,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 // Project imports:
 import 'package:talkbridge/constants/enums.dart';
+import 'package:talkbridge/features/home_screen/presentation/cubit/home_screen_cubit_cubit.dart';
 import 'package:talkbridge/features/language_picker/presentation/cubit/language_picker/language_picker_cubit.dart';
 import 'package:talkbridge/features/voice_record/presentation/cubits/voice_record/voice_record_cubit.dart';
+import 'package:talkbridge/utils/di.dart';
 
 class TextToSpeech extends StatelessWidget {
   final User userScreen;
@@ -57,20 +59,11 @@ class TextToSpeech extends StatelessWidget {
                                 .substring(0, 2),
                       );
 
-                      String textToSpeak() {
-                        final User userSpeaking = voiceRecordState.userSpeaking;
-                        if ((userScreen == User.host &&
-                                userSpeaking == User.host) ||
-                            (userScreen == User.guest &&
-                                userSpeaking == User.guest)) {
-                          return voiceRecordState.speechText;
-                        } else {
-                          return voiceRecordState.translation;
-                        }
-                      }
-
                       await ftts.speak(
-                        textToSpeak(),
+                        getIt<HomeScreenCubit>().getTextToSpeak(
+                          voiceRecordState: voiceRecordState,
+                          userScreen: userScreen,
+                        ),
                       );
                     }
                   },

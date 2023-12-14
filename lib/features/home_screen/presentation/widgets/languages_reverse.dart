@@ -25,8 +25,8 @@ class LanguagesReverse extends StatelessWidget {
                         .read<LanguagePickerCubit>()
                         .reverseLanguages();
                     if (!context.mounted) return;
-                    if (voiceRecordState.translation != '' ||
-                        voiceRecordState.speechText != '') {
+                    if (voiceRecordState.translation.isNotEmpty ||
+                        voiceRecordState.speechText.isNotEmpty) {
                       context.read<VoiceRecordCubit>().reverseTranslations(
                             speechText: voiceRecordState.speechText,
                             translation: voiceRecordState.translation,
